@@ -6,8 +6,15 @@
 #include "trie.h"
 
 /* Structs that rappresent the Queue */
-struct Node;
-struct Queue;
+struct QueueNode {
+    struct TrieNode* data;
+    struct Node* next;
+};
+
+struct Queue {
+    struct QueueNode* head;
+    struct QueueNode* tail;
+};
 
 /* Function to initialize the Queue */
 void init(struct Queue* q);

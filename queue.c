@@ -1,16 +1,5 @@
 #include "queue.h"
 
-/* Structs that rappresent the Queue */
-struct Node {
-    struct TrieNode* data;
-    struct Node* next;
-};
-
-struct Queue {
-    struct Node* head;
-    struct Node* tail;
-};
-
 /* Function to initialize the Queue */
 void init(struct Queue* q) {
     q->head = NULL;
@@ -24,7 +13,7 @@ int is_empty(struct Queue* q) {
 
 /* Function to add an element to the back of the Queue */
 void add(struct Queue* q, struct TrieNode* node) {
-    struct Node* new_node = (struct Node*) malloc(sizeof(struct Node));
+    struct QueueNode* new_node = (struct QueueNode*) malloc(sizeof(struct QueueNode));
     new_node->data = node;
     new_node->next = NULL;
 
@@ -44,7 +33,7 @@ struct TrieNode* pop(struct Queue* q) {
         return -1;
     }
 
-    struct Node* temp = q->head;
+    struct QueueNode* temp = q->head;
     struct TrieNode* node = temp->data;
     q->head = temp->next;
 

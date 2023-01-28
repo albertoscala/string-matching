@@ -1,21 +1,12 @@
 #include "trie.h"
 
-/* Struct that rappresent the Trie Node */
-struct TrieNode {
-    struct TrieNode* children[ALPHABET_SIZE];
-
-    bool is_end_of_word;
-    char *pattern;
-
-    struct TrieNode* failure;
-};
-
 /* Function to insert a brand new node to the Trie */
 struct TrieNode* insert_node() {
     struct TrieNode* p = (struct TrieNode *) malloc(sizeof(struct TrieNode));
 
-    for (int i = 0; i < ALPHABET_SIZE; i++)
-        p->children = NULL;
+    for (int i = 0; i < ALPHABET_SIZE; i++) {
+        p->children[i] = NULL;
+    }
 
     p->is_end_of_word = false;
 

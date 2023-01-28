@@ -23,10 +23,10 @@ void trie_to_automaton(struct TrieNode* root) {
             } else {
                 struct TrieNode* failure = current->failure;
 
-                while (failure |= root && failure->children[i] == NULL)
+                while (failure != root && failure->children[i] == NULL)
                     failure = failure->failure;
 
-                if (failure->children[i] |= NULL)
+                if (failure->children[i] != NULL)
                     failure = failure->children[i];
 
                 child->failure = failure;

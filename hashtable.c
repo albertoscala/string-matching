@@ -1,17 +1,5 @@
 #include "hashtable.h"
 
-#define SIZE 500
-
-struct Node {
-    char* key;
-    int value;
-    struct Node* next;
-};
-
-struct HashTable {
-    struct Node* array[SIZE];
-};
-
 struct HashTable* init_hash_map() {
     struct HashTable* table = (struct HashMap*) malloc(sizeof(struct HashTable));
     int i;
@@ -33,7 +21,7 @@ unsigned long hash(unsigned char *str) {
 
 void put(struct HashTable* table, char* key, int value) {
     int index = hash(key) % SIZE;
-    struct Node* new_node = (struct Node*) malloc(sizeof(struct Node));
+    struct HashTableNode* new_node = (struct HashTableNode*) malloc(sizeof(struct HashTableNode));
     new_node->key = strdup(key);
     new_node->value = value;
     new_node->next = table->array[index];
@@ -42,7 +30,7 @@ void put(struct HashTable* table, char* key, int value) {
 
 int get(struct HashTable* table, char* key) {
     int index = hash(key) % SIZE;
-    struct Node* current = table->array[index];
+    struct HashTableNode* current = table->array[index];
     while (current != NULL) {
         if (strcmp(current->key, key) == 0) {
             return current->value;
@@ -52,14 +40,10 @@ int get(struct HashTable* table, char* key) {
     return -1;
 }
 
-bool contains_key(struct HashTable* table, char* key) {
-    int index = hash(key) % SIZE;
-    struct Node* current = table->array[index];
+void fill_hashtable(struct HashTable* table, struct LinkedList* list) {
+    struct LinkedListNode* current = list->head;
     while (current != NULL) {
-        if (strcmp(current->key, key) == 0) {
-            return true;
-        }
+        put(table, current->data, 0);
         current = current->next;
     }
-    return false;
 }
