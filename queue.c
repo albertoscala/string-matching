@@ -28,11 +28,6 @@ void add(struct Queue* q, struct TrieNode* node) {
 
 /* Function to pop/return and delete the element at the head of the Queue */
 struct TrieNode* pop(struct Queue* q) {
-    if (is_empty(q)) {
-        printf("Queue is empty\n");
-        return -1;
-    }
-
     struct QueueNode* temp = q->head;
     struct TrieNode* node = temp->data;
     q->head = temp->next;

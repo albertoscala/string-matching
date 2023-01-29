@@ -8,7 +8,7 @@
 /* Structs that rappresent the Queue */
 struct QueueNode {
     struct TrieNode* data;
-    struct Node* next;
+    struct QueueNode* next;
 };
 
 struct Queue {

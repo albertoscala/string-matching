@@ -3,8 +3,8 @@
 
 #include "trie.h"
 #include "queue.h"
-#include "hashtable.h"
 #include "linkedlist.h"
+#include "hashtable.h"
 
 /* Function to convert the Trie into a DFA */
 void trie_to_automaton(struct TrieNode* root);

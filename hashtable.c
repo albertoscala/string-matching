@@ -1,7 +1,7 @@
 #include "hashtable.h"
 
 struct HashTable* init_hash_map() {
-    struct HashTable* table = (struct HashMap*) malloc(sizeof(struct HashTable));
+    struct HashTable* table = (struct HashTable*) malloc(sizeof(struct HashTable));
     int i;
     for (i = 0; i < SIZE; i++) {
         table->array[i] = NULL;
@@ -9,7 +9,7 @@ struct HashTable* init_hash_map() {
     return table;
 }
 
-unsigned long hash(unsigned char *str) {
+unsigned long hash(unsigned char* str) {
     unsigned long hash = 5381;
     int c;
 

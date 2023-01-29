@@ -25,7 +25,7 @@ void append(struct LinkedList* list, char* data) {
 void print_list(struct LinkedList* list) {
     struct LinkedListNode* current = list->head;
     while (current != NULL) {
-        printf("%d ", current->data);
+        printf("%s\n", current->data);
         current = current->next;
     }
 }
