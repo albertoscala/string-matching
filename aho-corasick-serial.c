@@ -83,12 +83,13 @@ int main(void) {
 }
 
 void search(struct TrieNode* root, struct LinkedList* haystacks, struct HashTable* table) {
-    struct TrieNode* p = root;
+    struct TrieNode* p;
 
     int count;
 
     for (int i = 0; i < length(haystacks); i++) {
 
+        p = root;
         char* haystack = get_at(haystacks, i);
 
         for (int j = 0; j < strlen(haystack); j++) {
@@ -102,6 +103,7 @@ void search(struct TrieNode* root, struct LinkedList* haystacks, struct HashTabl
 
             if (p->is_end_of_word) {
                 count = get(table, p->pattern);
+                printf("Trovato %s a riga %d il contatore è a %d e sarà a %d\n", p->pattern, i, count, count+1);
                 put(table, p->pattern, count+1);
             }
         }
