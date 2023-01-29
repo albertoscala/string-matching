@@ -31,3 +31,11 @@ void insert_pattern(struct TrieNode* root, char *pattern) {
     p->is_end_of_word = true;
     p->pattern = pattern;
 }
+
+void create_trie(struct TrieNode* root, struct LinkedList* patterns) {
+    struct LinkedListNode* current = patterns->head;
+    while (current != NULL) {
+        insert_pattern(root, current->data);
+        current = current->next;
+    }
+}

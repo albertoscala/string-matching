@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include "linkedlist.h"
+
 /* Constant that rapresent the lengh of the alphabet in ASCII */
 #define ALPHABET_SIZE 26
 
@@ -21,6 +23,8 @@ struct TrieNode {
 struct TrieNode* insert_node();
 
 /* Function to insert a pattern/needle into the Trie */
-void insert_pattern(struct TrieNode* root, char *pattern);
+void insert_pattern(struct TrieNode* root, char* pattern);
+
+void create_trie(struct TrieNode* root, struct LinkedList* patterns);
 
 #endif

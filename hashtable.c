@@ -1,6 +1,6 @@
 #include "hashtable.h"
 
-struct HashTable* init_hash_map() {
+struct HashTable* init_hash_table() {
     struct HashTable* table = (struct HashTable*) malloc(sizeof(struct HashTable));
     int i;
     for (i = 0; i < SIZE; i++) {
@@ -20,12 +20,20 @@ unsigned long hash(unsigned char* str) {
 }
 
 void put(struct HashTable* table, char* key, int value) {
-    int index = hash(key) % SIZE;
-    struct HashTableNode* new_node = (struct HashTableNode*) malloc(sizeof(struct HashTableNode));
-    new_node->key = strdup(key);
-    new_node->value = value;
-    new_node->next = table->array[index];
-    table->array[index] = new_node;
+    unsigned long hash_val = hash(key) % SIZE;
+    struct HashTableNode* current = table->array[hash_val];
+    while (current != NULL) {
+        if (strcmp(current->key, key) == 0) {
+            current->value = value;
+            return;
+        }
+        current = current->next;
+    }
+    struct HashTableNode* newNode = (struct HashTableNode*)malloc(sizeof(struct HashTableNode));
+    newNode->key = key;
+    newNode->value = value;
+    newNode->next = table->array[hash_val];
+    table->array[hash_val] = newNode;
 }
 
 int get(struct HashTable* table, char* key) {
@@ -45,5 +53,21 @@ void fill_hashtable(struct HashTable* table, struct LinkedList* list) {
     while (current != NULL) {
         put(table, current->data, 0);
         current = current->next;
+    }
+}
+
+void print_hash_table(struct HashTable* table) {
+    struct HashTableNode* temp;
+
+    for (int i = 0; i < SIZE; i++) {
+        temp = table->array[i];
+        printf("Bucket %d: ", i);
+
+        while (temp != NULL) {
+            printf("(%s, %d) ", temp->key, temp->value);
+            temp = temp->next;
+        }
+
+        printf("\n");
     }
 }

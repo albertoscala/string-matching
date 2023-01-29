@@ -19,7 +19,7 @@ int main(void) {
     char* haystack = NULL;
 
     if (getline(&haystack, &size, text) != -1) {
-        printf("Haystack value: %s\n", haystack);
+        printf("Haystack read correcly\n");
     } else {
         printf("Error while reading file\n");
     }
@@ -52,13 +52,41 @@ int main(void) {
         }
     }
 
+    printf("Patterns read correcly\n");
+
     fclose(patterns);
 
-    print_list(needles);
+    struct HashTable* table = init_hash_table();
+
+    fill_hashtable(table, needles);
+
+    create_trie(root, needles);
+
+    trie_to_automaton(root);
+
+    search(root, haystack, table);
+
+    print_hash_table(table);
 
     return 0;
 }
 
-void search(struct TrieNode* root, char *haystack, struct HashTable* table) {
-    
+void search(struct TrieNode* root, char* haystack, struct HashTable* table) {
+    int count;
+    struct TrieNode* p = root;
+
+    for (int i = 0; i < strlen(haystack); i++) {
+        int idx = haystack[i] - 'a';
+
+        while (p != root && p->children[idx] == NULL)
+            p = p->failure;
+
+        if (p->children[idx] != NULL)
+            p = p->children[idx];
+
+        if (p->is_end_of_word) {
+            count = get(table, p->pattern);
+            put(table, p->pattern, count+1);
+        }
+    }
 }
