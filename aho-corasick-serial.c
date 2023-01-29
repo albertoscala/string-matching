@@ -3,11 +3,14 @@
 
 #include "aho-corasick.h"
 
+/* Function to search the patterns */
 void search(struct TrieNode* root, struct LinkedList* haystacks, struct HashTable* table);
 
 int main(void) {
+    /* Creating the root of the Trie */
     struct TrieNode* root = insert_node();
 
+    /* Reading the haystacks from the file */
     FILE* text = fopen("test3t.txt", "r");
 
     if (text == NULL) {
@@ -27,7 +30,8 @@ int main(void) {
             buffer[strcspn(buffer, "\n")] = 0;
 
             string = (char*) malloc(strlen(buffer) + 1);
-            // copy the line to the new string
+            
+            /* copy the line to the new string */
             strcpy(string, buffer);
 
             append(haystacks, string);
@@ -40,6 +44,7 @@ int main(void) {
 
     fclose(text);
 
+    /* Reading the needles from the file */
     FILE* patterns = fopen("test3p.txt", "r");
 
     if (patterns == NULL) {
@@ -54,7 +59,8 @@ int main(void) {
             buffer[strcspn(buffer, "\n")] = 0;
 
             string = (char*) malloc(strlen(buffer) + 1);
-            // copy the line to the new string
+            
+            /* Copy the line to the new string */
             strcpy(string, buffer);
 
             append(needles, string);
@@ -67,12 +73,16 @@ int main(void) {
 
     fclose(patterns);
 
+    /* Creating the HashTable */
     struct HashTable* table = init_hash_table();
 
+    /* Filling the HashTable with the patterns and initializing the counters to zero */
     fill_hashtable(table, needles);
 
+    /* Creating the Trie given the LinkedList with the needles */
     create_trie(root, needles);
 
+    /* Creating the failure pointers transforming the Trie into a DFA */
     trie_to_automaton(root);
 
     search(root, haystacks, table);
@@ -82,6 +92,7 @@ int main(void) {
     return 0;
 }
 
+/* Function to search the patterns */
 void search(struct TrieNode* root, struct LinkedList* haystacks, struct HashTable* table) {
     struct TrieNode* p;
 
@@ -89,21 +100,27 @@ void search(struct TrieNode* root, struct LinkedList* haystacks, struct HashTabl
 
     for (int i = 0; i < length(haystacks); i++) {
 
+        /* Resetting the pointer of the Trie to the root */
         p = root;
+
+        /* Getting the next haystack to analyze */
         char* haystack = get_at(haystacks, i);
 
         for (int j = 0; j < strlen(haystack); j++) {
+            /* Getting the index for the Trie children */
             int idx = haystack[j] - 'a';
 
+            /* Next expected char not found */
             while (p != root && p->children[idx] == NULL)
                 p = p->failure;
 
+            /* Success continue */
             if (p->children[idx] != NULL)
                 p = p->children[idx];
 
+            /* If pattern is found */
             if (p->is_end_of_word) {
                 count = get(table, p->pattern);
-                printf("Trovato %s a riga %d il contatore è a %d e sarà a %d\n", p->pattern, i, count, count+1);
                 put(table, p->pattern, count+1);
             }
         }

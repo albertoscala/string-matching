@@ -31,6 +31,7 @@ int length(struct LinkedList* list);
 /* Function that returns the value of the Linked List at certain position */
 char* get_at(struct LinkedList* list, int pos);
 
+/* Function that returns if a value is already in the Linked List */
 bool is_in_list(struct LinkedList* list, char *value);
 
 #endif

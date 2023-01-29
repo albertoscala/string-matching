@@ -32,8 +32,10 @@ void insert_pattern(struct TrieNode* root, char *pattern) {
     p->pattern = pattern;
 }
 
+/* Creates the Trie given a Linked List of strings */
 void create_trie(struct TrieNode* root, struct LinkedList* patterns) {
     struct LinkedListNode* current = patterns->head;
+    
     while (current != NULL) {
         insert_pattern(root, current->data);
         current = current->next;

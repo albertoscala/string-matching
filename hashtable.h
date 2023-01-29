@@ -27,7 +27,7 @@ struct HashTable* init_hash_table();
 /* Hash function implementing djb2 hashing method */
 unsigned long hash(unsigned char *str);
 
-/* Function to put a new key in the Hash Table */
+/* Function to put a new key in the Hash Table and replace the value if key is already existant */
 void put(struct HashTable* table, char* key, int value);
 
 /* Function to get a value give the key from the Hash Table */

@@ -25,6 +25,7 @@ struct TrieNode* insert_node();
 /* Function to insert a pattern/needle into the Trie */
 void insert_pattern(struct TrieNode* root, char* pattern);
 
+/* Creates the Trie given a Linked List of strings */
 void create_trie(struct TrieNode* root, struct LinkedList* patterns);
 
 #endif
