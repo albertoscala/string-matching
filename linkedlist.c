@@ -29,3 +29,37 @@ void print_list(struct LinkedList* list) {
         current = current->next;
     }
 }
+
+int length(struct LinkedList* list) {
+    int length = 0;
+    struct LinkedListNode* current = list->head;
+    while (current != NULL) {
+        length = length + 1;
+        current = current->next;
+    }
+    return length;
+}
+
+char* get_at(struct LinkedList* list, int pos) {
+    int iter = 0;
+    struct LinkedListNode* current = list->head;
+    while (current != NULL) {
+        if (iter == pos) {
+            return current->data;
+        }
+        current = current->next;
+        iter = iter + 1;
+    }
+    return NULL;
+}
+
+bool is_in_list(struct LinkedList* list, char *value) {
+    struct LinkedListNode* current = list->head;
+    while (current != NULL) {
+        if (strcmp(current->data, value) == 0) {
+            return true;
+        }
+        current = current->next;
+    }
+    return false;
+}

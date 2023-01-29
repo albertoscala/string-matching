@@ -1,9 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <pthread.h>
 
 #include "aho-corasick.h"
 
-void search(struct TrieNode* root, struct LinkedList* haystacks, struct HashTable* table);
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
+struct Arguments {
+    struct LinkedList* haystacks;
+    struct TrieNode* root;
+    struct HashTable* table;
+};
+
+void haystacks_subset(struct LinkedList** datas, struct LinkedList* haystacks, int n_threads);
+void* search_thread(void* args);
+void search(struct LinkedList* haystacks, struct TrieNode* root, struct HashTable* table);
 
 int main(void) {
     struct TrieNode* root = insert_node();
@@ -75,14 +87,36 @@ int main(void) {
 
     trie_to_automaton(root);
 
-    search(root, haystacks, table);
+    search(haystacks, root, table);
 
     print_hash_table(table);
 
     return 0;
 }
 
-void search(struct TrieNode* root, struct LinkedList* haystacks, struct HashTable* table) {
+void haystacks_subset(struct LinkedList** datas, struct LinkedList* haystacks, int n_threads) {
+    int next_index = 0;
+    int list_size = length(haystacks);
+
+    // Linked Lists initialization
+    for (int i = 0; i < n_threads; i++) {
+        datas[i] = init_linked_list();
+    }
+
+    // Dividing tasks equally between the various threads
+    for (int i = 0; i < list_size; i++) {
+        append(datas[next_index], get_at(haystacks, i));
+        next_index = (next_index + 1) % n_threads;
+    }
+}
+
+void* search_thread(void* args) {
+    struct Arguments* data = (struct Arguments*) args;
+
+    struct LinkedList* haystacks = data->haystacks;
+    struct TrieNode* root = data->root;
+    struct HashTable* table = data->table;
+
     struct TrieNode* p = root;
 
     int count;
@@ -101,9 +135,39 @@ void search(struct TrieNode* root, struct LinkedList* haystacks, struct HashTabl
                 p = p->children[idx];
 
             if (p->is_end_of_word) {
+                pthread_mutex_lock(&mutex);
                 count = get(table, p->pattern);
                 put(table, p->pattern, count+1);
+                pthread_mutex_unlock(&mutex);
             }
         }
+    }
+}
+
+void search(struct LinkedList* haystacks, struct TrieNode* root, struct HashTable* table) {
+    int n_threads = sysconf(_SC_NPROCESSORS_ONLN) - 1;
+
+    pthread_t threads[n_threads];
+    struct LinkedList* datas[n_threads];
+
+    haystacks_subset(datas, haystacks, n_threads);
+    
+    /* Test to check is tasks are correcly distributed */
+    /*
+    for (int i = 0; i < n_threads; i++) {
+        printf("Datas %d\n", i);
+        print_list(datas[i]);
+    }
+    */
+    struct Arguments* args;
+
+    for (int i = 0; i < n_threads; i++) {
+        args = (struct Arguments*) malloc(sizeof(struct Arguments));
+        args->haystacks = datas[i];
+        args->root = root;
+        args->table = table;
+
+        pthread_create(&threads[i], NULL, search_thread, args);
+        pthread_join(threads[i], NULL);
     }
 }
