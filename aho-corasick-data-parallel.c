@@ -29,7 +29,7 @@ int main(void) {
     struct TrieNode* root = insert_node();
 
     /* Reading the haystacks from the file */
-    FILE* text = fopen("testa-100000-100t.txt", "r");
+    FILE* text = fopen("testa-10000-1000t.txt", "r");
 
     if (text == NULL) {
         printf("Error opening file\n");
@@ -64,7 +64,7 @@ int main(void) {
     fclose(text);
 
     /* Reading the needles from the file */
-    FILE* patterns = fopen("testa-50000-101p.txt", "r");
+    FILE* patterns = fopen("testa-500-10001p.txt", "r");
 
     if (patterns == NULL) {
         printf("Error opening file\n");
