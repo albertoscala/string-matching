@@ -8,7 +8,7 @@
 
 #include "linkedlist.h"
 
-#define SIZE 11
+#define SIZE 10
 
 /* Structs that rapresent the Hash Table */
 struct HashTableNode {

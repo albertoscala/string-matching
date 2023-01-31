@@ -23,7 +23,7 @@ unsigned long hash(unsigned char* str) {
 
 /* Function to put a new key in the Hash Table and replace the value if key is already existant */
 void put(struct HashTable* table, char* key, int value) {
-    unsigned long hash_val = hash(key) % SIZE;
+    unsigned long hash_val = hash((unsigned char*) key) % SIZE;
     struct HashTableNode* current = table->array[hash_val];
     
     while (current != NULL) {
@@ -43,7 +43,7 @@ void put(struct HashTable* table, char* key, int value) {
 
 /* Function to get a value give the key from the Hash Table */
 int get(struct HashTable* table, char* key) {
-    int index = hash(key) % SIZE;
+    int index = hash((unsigned char*) key) % SIZE;
     struct HashTableNode* current = table->array[index];
 
     while (current != NULL) {

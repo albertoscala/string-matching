@@ -29,7 +29,7 @@ int main(void) {
     struct TrieNode* root = insert_node();
 
     /* Reading the haystacks from the file */
-    FILE* text = fopen("testa-10000-1000t.txt", "r");
+    FILE* text = fopen("testa-1000000-10t.txt", "r");
 
     if (text == NULL) {
         printf("Error opening file\n");
@@ -54,8 +54,7 @@ int main(void) {
 
             append(haystacks, string);
         } else {
-            printf("Error while reading texts file\n");
-            return -1;
+            printf("Error while reading file\n");
         }
     }
 
@@ -64,7 +63,7 @@ int main(void) {
     fclose(text);
 
     /* Reading the needles from the file */
-    FILE* patterns = fopen("testa-500-10001p.txt", "r");
+    FILE* patterns = fopen("testa-500000-11p.txt", "r");
 
     if (patterns == NULL) {
         printf("Error opening file\n");
@@ -75,7 +74,7 @@ int main(void) {
 
     while (!feof(patterns)) {
         if (getline(&buffer, &size, patterns) != -1) {
-            //buffer[strcspn(buffer, "\n")] = 0;
+            buffer[strcspn(buffer, "\n")] = 0;
 
             string = (char*) malloc(strlen(buffer) + 1);
             
@@ -84,8 +83,7 @@ int main(void) {
 
             append(needles, string);
         } else {
-            printf("Error while reading patterns file\n");
-            return -1;
+            printf("Error while reading file\n");
         }
     }
 
@@ -176,9 +174,9 @@ void* search_thread(void* args) {
 /* Function to handle the search of the patterns */
 void search(struct LinkedList* haystacks, struct TrieNode* root, struct HashTable* table) {
     /* Getting the number of threads available on the machine */
-    int n_threads = sysconf(_SC_NPROCESSORS_ONLN);
+    int n_threads = sysconf(_SC_NPROCESSORS_ONLN) - 1;
 
-    pthread_t threads[n_threads - 1];
+    pthread_t threads[n_threads];
     struct LinkedList* datas[n_threads];
 
     /* Splitting the work */
@@ -193,12 +191,7 @@ void search(struct LinkedList* haystacks, struct TrieNode* root, struct HashTabl
         args->root = root;
         args->table = table;
 
-        /* Using all threads master and slaves */
-        if (i == 0)
-            search_thread(args);
-        else {
-            pthread_create(&threads[i - 1], NULL, search_thread, args);
-            pthread_join(threads[i - 1], NULL);
-        }
+        pthread_create(&threads[i], NULL, search_thread, args);
+        pthread_join(threads[i], NULL);
     }
 }
