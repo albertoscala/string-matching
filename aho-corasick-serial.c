@@ -11,7 +11,7 @@ int main(void) {
     struct TrieNode* root = insert_node();
 
     /* Reading the haystacks from the file */
-    FILE* text = fopen("test3t.txt", "r");
+    FILE* text = fopen("testa-1000000-10t.txt", "r");
 
     if (text == NULL) {
         printf("Error opening file\n");
@@ -36,7 +36,8 @@ int main(void) {
 
             append(haystacks, string);
         } else {
-            printf("Error while reading file\n");
+            printf("Error while reading texts file\n");
+            return -1;
         }
     }
 
@@ -45,7 +46,7 @@ int main(void) {
     fclose(text);
 
     /* Reading the needles from the file */
-    FILE* patterns = fopen("test3p.txt", "r");
+    FILE* patterns = fopen("testa-500000-11p.txt", "r");
 
     if (patterns == NULL) {
         printf("Error opening file\n");
@@ -65,7 +66,8 @@ int main(void) {
 
             append(needles, string);
         } else {
-            printf("Error while reading file\n");
+            printf("Error while reading patterns file\n");
+            return -1;
         }
     }
 
