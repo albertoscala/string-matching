@@ -29,7 +29,7 @@ int main(void) {
     struct TrieNode* root = insert_node();
 
     /* Reading the haystacks from the file */
-    FILE* text = fopen("test3t.txt", "r");
+    FILE* text = fopen("test1t.txt", "r");
 
     if (text == NULL) {
         printf("Error opening file\n");
@@ -63,7 +63,7 @@ int main(void) {
     fclose(text);
 
     /* Reading the needles from the file */
-    FILE* patterns = fopen("test3p.txt", "r");
+    FILE* patterns = fopen("test1p.txt", "r");
 
     if (patterns == NULL) {
         printf("Error opening file\n");
@@ -191,6 +191,7 @@ void search(struct LinkedList* haystacks, struct TrieNode* root, struct HashTabl
         args->root = root;
         args->table = table;
 
+        /* Using all threads master and slaves */
         if (i == 0)
             search_thread(args);
         else {
