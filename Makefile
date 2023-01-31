@@ -8,6 +8,3 @@ serial: aho-corasick-serial.c trie.c queue.c linkedlist.c hashtable.c aho-corasi
 
 data-parallel: aho-corasick-data-parallel.c trie.c queue.c linkedlist.c hashtable.c aho-corasick.c
 	$(CC) $(CFLAGS) aho-corasick-data-parallel.c trie.c queue.c linkedlist.c hashtable.c aho-corasick.c -o data-parallel -lpthread
-
-# un giorno lo farò promesso
-# trie-data-parallel: 
