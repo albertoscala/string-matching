@@ -16,7 +16,7 @@ struct TrieNode* insert_node() {
 }
 
 /* Function to insert a pattern/needle into the Trie */
-void insert_pattern(struct TrieNode* root, char *pattern) {
+void insert_pattern(struct TrieNode* root, char* pattern) {
     struct TrieNode* p = root;
 
     for (int i = 0; i < strlen(pattern); i++) {

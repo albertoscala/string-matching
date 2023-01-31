@@ -6,12 +6,17 @@
 /* Function to search the patterns */
 void search(struct TrieNode* root, struct LinkedList* haystacks, struct HashTable* table);
 
-int main(void) {
+int main(int argc, char* argv[]) {
+
+    /* Taking files as arguments */
+    char* text_file = argv[1];
+    char* patterns_file = argv[2];
+
     /* Creating the root of the Trie */
     struct TrieNode* root = insert_node();
 
     /* Reading the haystacks from the file */
-    FILE* text = fopen("testa-1000000-10t.txt", "r");
+    FILE* text = fopen(text_file, "r");
 
     if (text == NULL) {
         printf("Error opening file\n");
@@ -46,7 +51,7 @@ int main(void) {
     fclose(text);
 
     /* Reading the needles from the file */
-    FILE* patterns = fopen("testa-500000-11p.txt", "r");
+    FILE* patterns = fopen(patterns_file, "r");
 
     if (patterns == NULL) {
         printf("Error opening file\n");
