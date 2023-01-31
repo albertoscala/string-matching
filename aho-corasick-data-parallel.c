@@ -174,9 +174,9 @@ void* search_thread(void* args) {
 /* Function to handle the search of the patterns */
 void search(struct LinkedList* haystacks, struct TrieNode* root, struct HashTable* table) {
     /* Getting the number of threads available on the machine */
-    int n_threads = sysconf(_SC_NPROCESSORS_ONLN) - 1;
+    int n_threads = sysconf(_SC_NPROCESSORS_ONLN);
 
-    pthread_t threads[n_threads];
+    pthread_t threads[n_threads - 1];
     struct LinkedList* datas[n_threads];
 
     /* Splitting the work */
@@ -191,7 +191,11 @@ void search(struct LinkedList* haystacks, struct TrieNode* root, struct HashTabl
         args->root = root;
         args->table = table;
 
-        pthread_create(&threads[i], NULL, search_thread, args);
-        pthread_join(threads[i], NULL);
+        if (i == 0)
+            search_thread(args);
+        else {
+            pthread_create(&threads[i - 1], NULL, search_thread, args);
+            pthread_join(threads[i - 1], NULL);
+        }
     }
 }
