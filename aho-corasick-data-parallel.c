@@ -141,6 +141,8 @@ void* search_thread(void* args) {
     struct TrieNode* root = data->root;
     struct HashTable* table = data->table;
 
+    free(args);
+    
     struct TrieNode* p = root;
 
     int count;
@@ -197,6 +199,9 @@ void search(struct LinkedList* haystacks, struct TrieNode* root, struct HashTabl
         args->table = table;
 
         pthread_create(&threads[i], NULL, search_thread, args);
+    }
+    
+    for (int i = 0; i < n_threads; i++) {
         pthread_join(threads[i], NULL);
     }
 }
