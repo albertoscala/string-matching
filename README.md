@@ -1,9 +1,9 @@
 # String Matching
 
-## Step 1: Building the Trie
+## Building the Trie
 
-## Step 2: Add Failure Links
+## Add Failure Links
 
-## Step 3: Add Output Links
+## Add Output Links
 
-## Step 4: Writing the Search
+## Writing the Search
