@@ -14,7 +14,7 @@ Using P = {vine, vincent, cent, center}, say we start with the pattern 'vine'. W
 
 ![Example 2](https://user-images.githubusercontent.com/31989626/222902343-9ca00437-d664-446a-b9f9-2685aac4ab0a.png)
 
-## Add Failure Links
+## Adding Failure Links
 
 Now to add the failure links, we perform a BFS (Breadth First Search) of the tree, adding an edge for each node except the root. If a node is one hop away from the root, its failure link goes to the root. Adding failure links in blue, the failure links for the nodes corresponding to 'v' and 'c' are:
 
@@ -28,7 +28,7 @@ If this node has an edge for x, then set wx's failure link to point at nx. Else 
 
 ![Example 5](https://user-images.githubusercontent.com/31989626/222902414-88d59816-4c38-4337-ad4c-a47dca47cb3d.png)
 
-## Add Output Links
+## Adding Output Links
 
 As you are performing the BFS to fill in the failure links, you can also fill in the output links (all initially null). Let the current node be n. Follow n's failure link and let the node you arrive at be called m.
 
