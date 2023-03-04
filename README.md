@@ -40,7 +40,11 @@ If m corresponds to one of the pattern strings (is marked with a double circle),
 
 ## Writing the Search
 
+## Parallelization
 
+### Problems
+
+### Solution
 
 ## License
 
