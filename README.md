@@ -1,5 +1,7 @@
 # String Matching
 
+In this repository I'm going to show my multicore programming course project. The project was to implement a string matching algorithm, in this case I decided to use the Aho-Corasick, to find the patterns in some strings received from a socket. Instead of using actual sockets I decided to "emulate" the work of them with some files. The main core of the project was to make a serial version of the algorithm to parallelize using the techniques learnt at the course.
+
 ## Building the Trie
 
 The first step is to build a Trie for the pattern strings.
