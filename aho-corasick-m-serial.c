@@ -5,18 +5,22 @@
 
 #define ALPHABET_SIZE 26
 
+/* Struct that rappresent the Trie Node */
 struct TrieNode {
     struct TrieNode* children[ALPHABET_SIZE];
     bool is_end_of_word;
     char* pattern;
-    struct TrieNode* failure;
-    struct TrieNode* output;
+    struct TrieNode* failure;   /* Failure link */
+    struct TrieNode* output;    /* Output link */
 };
 
+/* Function to insert a brand new node to the Trie */
 struct TrieNode* insert_node();
 
+/* Function to insert a pattern/needle into the Trie */
 void insert_pattern(struct TrieNode* root, char* pattern);
 
+/* Structs that rappresent the Queue */
 struct Queue {
     struct QueueNode* head;
     struct QueueNode* tail;
@@ -27,18 +31,25 @@ struct QueueNode {
     struct QueueNode* next;
 };
 
+/* Function to initialize the Queue */
 struct Queue* init();
 
+/* Function to check if the Queue is empty */
 bool is_empty(struct Queue* q);
 
+/* Function to add an element to the Queue */
 void enqueue(struct Queue* q, struct TrieNode* node);
 
+/* Function to remove the element at the head of the Queue */
 struct TrieNode* dequeue(struct Queue* q);
 
+/* Function to fill the failure links */
 void build_failure_links(struct TrieNode* root);
 
+/* Function to fill the output links */
 void add_output_links(struct TrieNode* root);
 
+/* Function to search the patterns */
 void search(struct TrieNode* root, char* haystack);
 
 int main(int argc, char* argv[]) {
@@ -48,6 +59,7 @@ int main(int argc, char* argv[]) {
     char* buffer = NULL;
     char* string = NULL;
     
+    /* Start reading texts file */
     FILE* texts = fopen(argv[1], "r");
     
     if (texts == NULL) {
@@ -79,11 +91,13 @@ int main(int argc, char* argv[]) {
     }
 
     fclose(texts);
+    /* End reading texts file */
 
     size = 0;
     buffer = NULL;
     string = NULL;
 
+    /* Start reading patterns file */
     FILE* patterns = fopen(argv[2], "r");
 
     if (patterns == NULL) {
@@ -115,9 +129,12 @@ int main(int argc, char* argv[]) {
     }
 
     fclose(patterns);
+    /* End reading patterns file */
 
+    /* Create the Trie */
     struct TrieNode* root = insert_node();
 
+    /* Fill the Trie with the patterns */
     for (int i = 0; i < n_size; i++) {
         printf("Pattern %d: %s\n", i, needles[i]);
         insert_pattern(root, needles[i]);
@@ -133,6 +150,7 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
+/* Function to insert a brand new node to the Trie */
 struct TrieNode* insert_node() {
     struct TrieNode* p = (struct TrieNode *) malloc(sizeof(struct TrieNode));
 
@@ -150,6 +168,7 @@ struct TrieNode* insert_node() {
     return p;
 }
 
+/* Function to insert a pattern/needle into the Trie */
 void insert_pattern(struct TrieNode* root, char* pattern) {
     struct TrieNode* p = root;
 
@@ -167,6 +186,7 @@ void insert_pattern(struct TrieNode* root, char* pattern) {
     p->pattern = pattern;
 }
 
+/* Function to initialize the Queue */
 struct Queue* init() {
     struct Queue* q = (struct Queue*) malloc(sizeof(struct Queue));
     
@@ -176,6 +196,7 @@ struct Queue* init() {
     return q;
 }
 
+/* Function to check if the Queue is empty */
 bool is_empty(struct Queue* q) {
     if (q->head == NULL)
         return true;
@@ -183,25 +204,33 @@ bool is_empty(struct Queue* q) {
     return false;
 }
 
+/* Function to add an element to the Queue */
 void enqueue(struct Queue* q, struct TrieNode* node) {
+    /* Create a new node for the Queue */
     struct QueueNode* new_node = (struct QueueNode*) malloc(sizeof(struct QueueNode));
     new_node->data = node;
     new_node->next = NULL;
 
+    /* Special case: first element of the Queue */
     if (q->tail == NULL) {
         q->head = q->tail = new_node;
         return;
     }
 
+    /* Add at the tail of the Queue */
     q->tail->next = new_node;
     q->tail = new_node;
 }
 
+/* Function to remove the element at the head of the Queue */
 struct TrieNode* dequeue(struct Queue* q) {
     struct QueueNode* temp = q->head;
     struct TrieNode* node = temp->data;
+    
+    /* Set the head to the second element */
     q->head = temp->next;
 
+    /* Special case: last element of the Queue */
     if (q->head == NULL)
         q->tail = NULL;
 
@@ -210,6 +239,7 @@ struct TrieNode* dequeue(struct Queue* q) {
     return node;
 }
 
+/* Function to fill the failure links */
 void build_failure_links(struct TrieNode* root) {
     /* Initializing the queue */
     struct Queue* q = init();
@@ -280,6 +310,7 @@ void search(struct TrieNode* root, char* haystack) {
     int n = strlen(haystack);
     struct TrieNode* curr = root;
 
+    /* Iterating over the string to analyze */
     for (int i = 0; i < n; i++) {
         int index = haystack[i] - 'a';
 
@@ -287,24 +318,23 @@ void search(struct TrieNode* root, char* haystack) {
             curr = curr->failure;
         }
 
-        if (curr->children[index]) {
+        if (curr->children[index])
             curr = curr->children[index];
-        }
 
+        /* Pattern match was found */
         if (curr->is_end_of_word)
             printf("Pattern found: %s\n", curr->pattern);
 
-        if (curr->output) {
-            // A pattern match was found
+        /* Pattern match was found */ 
+        if (curr->output)
             printf("Pattern found: %s\n", curr->output->pattern);
-        }
 
         struct TrieNode* suffix_node = curr->failure;
         while (suffix_node) {
-            if (suffix_node->output) {
-                // A pattern match was found
+            /* Pattern match was found */
+            if (suffix_node->output)
                 printf("Pattern found: %s\n", suffix_node->output->pattern);
-            }
+            
             suffix_node = suffix_node->failure;
         }
     }
