@@ -37,3 +37,9 @@ If m corresponds to one of the pattern strings (is marked with a double circle),
 ![Example 6](https://user-images.githubusercontent.com/31989626/222902439-2df025ca-6d40-4922-9ba3-bfb7b5b5c3a5.png)
 
 ## Writing the Search
+
+
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
