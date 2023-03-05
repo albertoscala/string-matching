@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include "linkedlist.h"
-
 /* Constant that rapresent the lengh of the alphabet in ASCII */
 #define ALPHABET_SIZE 26
 
