@@ -63,7 +63,7 @@ struct Arguments {
 };
 
 /* Function to prepare the search for the threads */
-void search(struct TrieNode* root, char** haystacks, char** needles, int* counters);
+void search(struct TrieNode* root, char** haystacks, int h_size, int* counters);
 
 /* Function to search the patterns */
 void* threaded_search(void* args);
@@ -163,7 +163,7 @@ int main(int argc, char* argv[]) {
 
     add_output_links(root);
 
-    search(root, haystacks, needles, counters);
+    search(root, haystacks, h_size, counters);
 
     //TODO: Make the print for the counters
 
@@ -330,13 +330,43 @@ void add_output_links(struct TrieNode* root) {
     }
 }
 
-void search(struct TrieNode* root, char** haystacks, char** needles, int* counters) {
+void search(struct TrieNode* root, char** haystacks, int h_size, int* counters) {
     /* Getting the number of threads available on the machine */
     int n_threads = sysconf(_SC_NPROCESSORS_ONLN) - 1;
 
     int* haystacks_subsets[n_threads];
 
     // TODO: Trova un modo per splittare
+
+    int part_size = h_size / n_threads;
+    int remainder = h_size % n_threads;
+    int start_idx = 0;
+    
+    // SI ma fallo per le stringhe. Usa crea l'array e poi passalo subito e successivamente deallocalo dal thread
+    for(int i = 0; i < n_threads; i++) {
+        if (i == n_threads - 1 && remainder > 0) {
+            haystacks_subsets[i] = malloc((h_size - start_idx + part_size) * sizeof(int));
+            for (int j = start_idx + part_size, k=0; j < h_size; j++, k++) {
+                haystacks_subsets[i][k] = haystacks[j];
+            }
+        } else {
+            haystacks_subsets[i] = malloc(part_size * sizeof(int));
+            for (int j = start_idx, k=0; j < start_idx + part_size; j++, k++) {
+                haystacks_subsets[i][k] = haystacks[j];
+            }
+        }
+
+        start_idx += part_size;
+    }
+    
+    for (int i = 0; i < n_threads; i++) {
+        printf("Array n. %d\n", i);
+        for (int j = 0; j < sizeof(haystacks_subsets[i])/sizeof(haystacks_subsets[i][0]); j++) {
+            printf("%d\n", )
+        }
+    }
+
+    return 0;
 }
 
 void* threaded_search(void* args) {
