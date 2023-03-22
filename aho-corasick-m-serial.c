@@ -10,6 +10,7 @@ struct TrieNode {
     struct TrieNode* children[ALPHABET_SIZE];
     bool is_end_of_word;
     char* pattern;
+    int id;
     struct TrieNode* failure;   /* Failure link */
     struct TrieNode* output;    /* Output link */
 };
@@ -18,7 +19,7 @@ struct TrieNode {
 struct TrieNode* insert_node();
 
 /* Function to insert a pattern/needle into the Trie */
-void insert_pattern(struct TrieNode* root, char* pattern);
+void insert_pattern(struct TrieNode* root, char* pattern, int id);
 
 /* Structs that rappresent the Queue */
 struct Queue {
@@ -50,10 +51,12 @@ void build_failure_links(struct TrieNode* root);
 void add_output_links(struct TrieNode* root);
 
 /* Function to search the patterns */
-void search(struct TrieNode* root, char* haystack);
+void search(struct TrieNode* root, char* haystack, int* counters);
 
 int main(int argc, char* argv[]) {
     int h_size = 0, n_size = 0;
+
+    int* counters;
 
     size_t size = 0;
     char* buffer = NULL;
@@ -136,16 +139,23 @@ int main(int argc, char* argv[]) {
 
     /* Fill the Trie with the patterns */
     for (int i = 0; i < n_size; i++) {
-        printf("Pattern %d: %s\n", i, needles[i]);
-        insert_pattern(root, needles[i]);
+        // printf("Pattern %d: %s\n", i, needles[i]);
+        insert_pattern(root, needles[i], i);
     }
+
+    counters = calloc(n_size, sizeof(int));
 
     build_failure_links(root);
 
     add_output_links(root);
 
     for (int i = 0; i < h_size; i++)
-        search(root, haystacks[i]);
+        search(root, haystacks[i], counters);
+
+    for (int i = 0; i < n_size; i++) {
+        if (counters[i] != 0)
+            printf("Pattern \"%s\" trovato n^%d volte\n", needles[i], counters[i]);
+    }
 
     return 0;
 }
@@ -169,7 +179,7 @@ struct TrieNode* insert_node() {
 }
 
 /* Function to insert a pattern/needle into the Trie */
-void insert_pattern(struct TrieNode* root, char* pattern) {
+void insert_pattern(struct TrieNode* root, char* pattern, int id) {
     struct TrieNode* p = root;
 
     for (int i = 0; i < strlen(pattern); i++) {
@@ -184,6 +194,8 @@ void insert_pattern(struct TrieNode* root, char* pattern) {
     p->is_end_of_word = true;
 
     p->pattern = pattern;
+
+    p->id = id;
 }
 
 /* Function to initialize the Queue */
@@ -306,7 +318,7 @@ void add_output_links(struct TrieNode* root) {
     }
 }
 
-void search(struct TrieNode* root, char* haystack) {
+void search(struct TrieNode* root, char* haystack, int* counters) {
     int n = strlen(haystack);
     struct TrieNode* curr = root;
 
@@ -323,17 +335,20 @@ void search(struct TrieNode* root, char* haystack) {
 
         /* Pattern match was found */
         if (curr->is_end_of_word)
-            printf("Pattern found: %s\n", curr->pattern);
+            counters[curr->id] = counters[curr->id] + 1;
+            //printf("Pattern found: %s\n", curr->pattern);
 
         /* Pattern match was found */ 
         if (curr->output)
-            printf("Pattern found: %s\n", curr->output->pattern);
+            counters[curr->output->id] = counters[curr->output->id] + 1;
+            // printf("Pattern found: %s\n", curr->output->pattern);
 
         struct TrieNode* suffix_node = curr->failure;
         while (suffix_node) {
             /* Pattern match was found */
             if (suffix_node->output)
-                printf("Pattern found: %s\n", suffix_node->output->pattern);
+                counters[suffix_node->output->id] = counters[suffix_node->output->id] + 1;
+                // printf("Pattern found: %s\n", suffix_node->output->pattern);
             
             suffix_node = suffix_node->failure;
         }

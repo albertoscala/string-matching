@@ -57,9 +57,9 @@ void add_output_links(struct TrieNode* root);
 struct Arguments {
     struct TrieNode* root;
     char** haystacks;
-    int haystacks_n;
+    int haystacks_start;
+    int haystacks_end;
     int* counters;
-    int counters_n;
 };
 
 /* Function to prepare the search for the threads */
@@ -155,7 +155,7 @@ int main(int argc, char* argv[]) {
 
     /* Fill the Trie with the patterns */
     for (int i = 0; i < n_size; i++) {
-        printf("Pattern %d: %s\n", i, needles[i]);
+        // printf("Pattern %d: %s\n", i, needles[i]);
         insert_pattern(root, needles[i], i);
     }
 
@@ -165,7 +165,10 @@ int main(int argc, char* argv[]) {
 
     search(root, haystacks, h_size, counters);
 
-    //TODO: Make the print for the counters
+    for (int i=0; i < n_size; i++) {
+        if (counters[i] != 0)
+            printf("Pattern \"%s\" trovato n^%d volte\n", needles[i], counters[i]);
+    }
 
     return 0;
 }
@@ -180,8 +183,6 @@ struct TrieNode* insert_node() {
     p->is_end_of_word = false;
 
     p->pattern = NULL;
-
-    p->id = NULL;
 
     p->failure = NULL;
 
@@ -203,7 +204,7 @@ void insert_pattern(struct TrieNode* root, char* pattern, int id) {
         p = p->children[idx];
     }
 
-    p->id;
+    p->id = id;
 
     p->is_end_of_word = true;
 
@@ -334,39 +335,45 @@ void search(struct TrieNode* root, char** haystacks, int h_size, int* counters) 
     /* Getting the number of threads available on the machine */
     int n_threads = sysconf(_SC_NPROCESSORS_ONLN) - 1;
 
-    int* haystacks_subsets[n_threads];
+    int l_threads = (h_size < n_threads) ? h_size : n_threads;
+
+    pthread_t threads[l_threads];
+
+    struct Arguments* args;
 
     // TODO: Trova un modo per splittare
 
-    int part_size = h_size / n_threads;
-    int remainder = h_size % n_threads;
-    int start_idx = 0;
-    
-    // SI ma fallo per le stringhe. Usa crea l'array e poi passalo subito e successivamente deallocalo dal thread
-    for(int i = 0; i < n_threads; i++) {
-        if (i == n_threads - 1 && remainder > 0) {
-            haystacks_subsets[i] = malloc((h_size - start_idx + part_size) * sizeof(int));
-            for (int j = start_idx + part_size, k=0; j < h_size; j++, k++) {
-                haystacks_subsets[i][k] = haystacks[j];
-            }
-        } else {
-            haystacks_subsets[i] = malloc(part_size * sizeof(int));
-            for (int j = start_idx, k=0; j < start_idx + part_size; j++, k++) {
-                haystacks_subsets[i][k] = haystacks[j];
-            }
-        }
+    int part_size = h_size / l_threads;
+    int remainder = h_size % l_threads;
+    int start_idx = 0, end_idx = 0;
 
-        start_idx += part_size;
+    for(int i = 0; i < l_threads; i++) {
+        end_idx += part_size;
+
+        if (remainder > 0) {
+            end_idx++;
+            remainder--;
+        }
+        
+        printf("Start %d: %d\n", i, start_idx);
+        printf("End %d: %d\n", i, end_idx);
+
+        args = malloc(sizeof(struct Arguments));
+
+        args->root = root;
+        args->haystacks = haystacks;
+        args->haystacks_start = start_idx;
+        args->haystacks_end = end_idx;
+        args->counters = counters;
+
+        pthread_create(&threads[i], NULL, threaded_search, args);
+
+        start_idx = end_idx;
     }
     
-    for (int i = 0; i < n_threads; i++) {
-        printf("Array n. %d\n", i);
-        for (int j = 0; j < sizeof(haystacks_subsets[i])/sizeof(haystacks_subsets[i][0]); j++) {
-            printf("%d\n", )
-        }
+    for (int i = 0; i < l_threads; i++) {
+        pthread_join(threads[i], NULL);
     }
-
-    return 0;
 }
 
 void* threaded_search(void* args) {
@@ -375,12 +382,12 @@ void* threaded_search(void* args) {
     struct TrieNode* root = pa->root;
 
     char** haystacks = pa->haystacks;
-    int haystacks_n = pa->haystacks_n;
+    int haystacks_start = pa->haystacks_start;
+    int haystacks_end = pa->haystacks_end;
 
     int* counters = pa->counters;
-    int counters_n = pa ->counters_n;
 
-    for (int h = 0; h < haystacks_n; h++) {
+    for (int h = haystacks_start; h < haystacks_end; h++) {
         char* haystack = haystacks[h];
     
         int n = strlen(haystack);
@@ -427,4 +434,6 @@ void* threaded_search(void* args) {
             }
         }
     }
+
+    pthread_exit(NULL);
 }
