@@ -165,10 +165,14 @@ int main(int argc, char* argv[]) {
 
     search(root, haystacks, h_size, counters);
 
+    /*
     for (int i=0; i < n_size; i++) {
         if (counters[i] != 0)
             printf("Pattern \"%s\" trovato n^%d volte\n", needles[i], counters[i]);
     }
+    */
+
+    // Free the memory
 
     return 0;
 }
@@ -341,8 +345,6 @@ void search(struct TrieNode* root, char** haystacks, int h_size, int* counters) 
 
     struct Arguments* args;
 
-    // TODO: Trova un modo per splittare
-
     int part_size = h_size / l_threads;
     int remainder = h_size % l_threads;
     int start_idx = 0, end_idx = 0;
@@ -354,9 +356,6 @@ void search(struct TrieNode* root, char** haystacks, int h_size, int* counters) 
             end_idx++;
             remainder--;
         }
-        
-        printf("Start %d: %d\n", i, start_idx);
-        printf("End %d: %d\n", i, end_idx);
 
         args = malloc(sizeof(struct Arguments));
 
@@ -384,6 +383,8 @@ void* threaded_search(void* args) {
     char** haystacks = pa->haystacks;
     int haystacks_start = pa->haystacks_start;
     int haystacks_end = pa->haystacks_end;
+
+    printf("Thread creato n tasks %d start %d end %d\n", haystacks_end - haystacks_start, haystacks_start, haystacks_end);
 
     int* counters = pa->counters;
 
