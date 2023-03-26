@@ -21,6 +21,8 @@ struct TrieNode* insert_node();
 /* Function to insert a pattern/needle into the Trie */
 void insert_pattern(struct TrieNode* root, char* pattern, int id);
 
+void free_trie(struct TrieNode* root);
+
 /* Structs that rappresent the Queue */
 struct Queue {
     struct QueueNode* head;
@@ -157,6 +159,12 @@ int main(int argc, char* argv[]) {
             printf("Pattern \"%s\" trovato n^%d volte\n", needles[i], counters[i]);
     }
 
+    /* Memory freeing */
+    free_trie(root);
+    // free counters
+    // free haystacks
+    // free needles
+
     return 0;
 }
 
@@ -196,6 +204,19 @@ void insert_pattern(struct TrieNode* root, char* pattern, int id) {
     p->pattern = pattern;
 
     p->id = id;
+}
+
+void free_trie(struct TrieNode* root) {
+    struct TrieNode* p = root;
+
+    if (p == NULL)
+        return;
+
+    for (int i = 0; i < ALPHABET_SIZE; i++) {
+        free_trie(p->children[i]);
+    }
+
+    free(p);
 }
 
 /* Function to initialize the Queue */
