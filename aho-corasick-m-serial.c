@@ -141,7 +141,6 @@ int main(int argc, char* argv[]) {
 
     /* Fill the Trie with the patterns */
     for (int i = 0; i < n_size; i++) {
-        // printf("Pattern %d: %s\n", i, needles[i]);
         insert_pattern(root, needles[i], i);
     }
 
@@ -160,10 +159,22 @@ int main(int argc, char* argv[]) {
     }
 
     /* Memory freeing */
+
+    /* Freeing trie */
     free_trie(root);
-    // free counters
-    // free haystacks
-    // free needles
+
+    /* Freeing counters */
+    free(counters);
+
+    /* Freeing haystacks */
+    for (int i = 0; i < h_size; i++)
+        free(haystacks[i]);
+    free(haystacks);
+
+    /* Freeing needles */
+    for (int i = 0; i < n_size; i++)
+        free(needles[i]);
+    free(needles);
 
     return 0;
 }
@@ -308,6 +319,8 @@ void build_failure_links(struct TrieNode* root) {
             enqueue(q, child);
         }
     }
+
+    free(q);
 }
 
 void add_output_links(struct TrieNode* root) {
@@ -337,6 +350,8 @@ void add_output_links(struct TrieNode* root) {
             enqueue(q, child);
         }
     }
+
+    free(q);
 }
 
 void search(struct TrieNode* root, char* haystack, int* counters) {

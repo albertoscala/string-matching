@@ -25,6 +25,8 @@ struct TrieNode* insert_node();
 /* Function to insert a pattern/needle into the Trie */
 void insert_pattern(struct TrieNode* root, char* pattern, int id);
 
+void free_trie(struct TrieNode* root);
+
 /* Structs that rappresent the Queue */
 struct Queue {
     struct QueueNode* head;
@@ -155,7 +157,6 @@ int main(int argc, char* argv[]) {
 
     /* Fill the Trie with the patterns */
     for (int i = 0; i < n_size; i++) {
-        // printf("Pattern %d: %s\n", i, needles[i]);
         insert_pattern(root, needles[i], i);
     }
 
@@ -165,14 +166,28 @@ int main(int argc, char* argv[]) {
 
     search(root, haystacks, h_size, counters);
 
-    /*
     for (int i=0; i < n_size; i++) {
         if (counters[i] != 0)
             printf("Pattern \"%s\" trovato n^%d volte\n", needles[i], counters[i]);
     }
-    */
 
-    // Free the memory
+    /* Memory freeing */
+
+    /* Freeing trie */
+    free_trie(root);
+
+    /* Freeing counters */
+    free(counters);
+
+    /* Freeing haystacks */
+    for (int i = 0; i < h_size; i++)
+        free(haystacks[i]);
+    free(haystacks);
+
+    /* Freeing needles */
+    for (int i = 0; i < n_size; i++)
+        free(needles[i]);
+    free(needles);
 
     return 0;
 }
@@ -213,6 +228,19 @@ void insert_pattern(struct TrieNode* root, char* pattern, int id) {
     p->is_end_of_word = true;
 
     p->pattern = pattern;
+}
+
+void free_trie(struct TrieNode* root) {
+    struct TrieNode* p = root;
+
+    if (p == NULL)
+        return;
+
+    for (int i = 0; i < ALPHABET_SIZE; i++) {
+        free_trie(p->children[i]);
+    }
+
+    free(p);
 }
 
 /* Function to initialize the Queue */
@@ -304,6 +332,8 @@ void build_failure_links(struct TrieNode* root) {
             enqueue(q, child);
         }
     }
+
+    free(q);
 }
 
 void add_output_links(struct TrieNode* root) {
@@ -333,6 +363,8 @@ void add_output_links(struct TrieNode* root) {
             enqueue(q, child);
         }
     }
+
+    free(q);
 }
 
 void search(struct TrieNode* root, char** haystacks, int h_size, int* counters) {
@@ -384,7 +416,7 @@ void* threaded_search(void* args) {
     int haystacks_start = pa->haystacks_start;
     int haystacks_end = pa->haystacks_end;
 
-    printf("Thread creato n tasks %d start %d end %d\n", haystacks_end - haystacks_start, haystacks_start, haystacks_end);
+    // printf("Thread creato n tasks %d start %d end %d\n", haystacks_end - haystacks_start, haystacks_start, haystacks_end);
 
     int* counters = pa->counters;
 
