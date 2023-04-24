@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include <pthread.h>
+#include <sys/time.h>
 
 #define ALPHABET_SIZE 26
 
@@ -71,6 +72,9 @@ void search(struct TrieNode* root, char** haystacks, int h_size, int* counters);
 void* threaded_search(void* args);
 
 int main(int argc, char* argv[]) {
+
+    struct timeval begin, end;
+
     int* counters;
     int h_size = 0, n_size = 0;
 
@@ -164,12 +168,24 @@ int main(int argc, char* argv[]) {
 
     add_output_links(root);
 
+    gettimeofday(&begin, 0);
+
     search(root, haystacks, h_size, counters);
 
+    gettimeofday(&end, 0);
+
+    long seconds = end.tv_sec - begin.tv_sec;
+    long microseconds = end.tv_usec - begin.tv_usec;
+    double elapsed = seconds + microseconds*1e-6;
+    
+    printf("Time measured: %.3f seconds.\n", elapsed);
+
+    /*
     for (int i=0; i < n_size; i++) {
         if (counters[i] != 0)
             printf("Pattern \"%s\" trovato n^%d volte\n", needles[i], counters[i]);
     }
+    */
 
     /* Memory freeing */
 
