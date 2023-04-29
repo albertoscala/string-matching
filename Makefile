@@ -6,6 +6,9 @@ all: m-serial m-pthread m-openmp
 m-serial: aho-corasick-m-serial.c
 	$(CC) $(CFLAGS) aho-corasick-m-serial.c -o m-serial
 
+mt-serial: aho-corasick-mt-serial.c
+	$(CC) $(CFLAGS) aho-corasick-mt-serial.c -o mt-serial
+
 m-pthread: aho-corasick-m-pthread.c
 	$(CC) $(CFLAGS) aho-corasick-m-pthread.c -o m-pthread -lpthread
 

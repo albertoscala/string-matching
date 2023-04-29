@@ -14,7 +14,7 @@
 #define MAXC 26
 
 /* Number of strings to analyze */
-#define HSTRN 2
+#define HSTRN 1
 
 /* Length of strings to analyze */
 #define HSTRL 10
@@ -67,7 +67,7 @@ int dequeue(struct Queue* q);
 //         in the text.
 // Returns the number of states that the built machine has.
 // States are numbered 0 up to the return value - 1, inclusive.
-int build_ac_graph(char needles[NSTRN][NSTRL], int n_size)
+int build_ac_graph(char needles[NSTRN][NSTRL])
 {
     // Initialize all values in g function as 0.
     memset(out, 0, sizeof(out));
@@ -80,7 +80,7 @@ int build_ac_graph(char needles[NSTRN][NSTRL], int n_size)
  
     // Construct values for goto function, i.e., fill g[][]
     // This is same as building a Trie for arr[]
-    for (int i = 0; i < n_size; ++i) {
+    for (int i = 0; i < NSTRN; ++i) {
 
         char* needle = needles[i];
 
@@ -236,7 +236,7 @@ int find_next_state(int currentState, char nextInput) {
 }
  
 /* This function finds all the occurrences */
-void search(int n_size, char haystacks[HSTRN][HSTRL], int* counters) {
+void search(char haystacks[HSTRN][HSTRL], int* counters) {
 
     /* Initialize current state */
     int current_state = 0;
@@ -254,7 +254,7 @@ void search(int n_size, char haystacks[HSTRN][HSTRL], int* counters) {
                 continue;
 
             /* Match found, update patterns counter. */
-            for (int k = 0; k < n_size; k++) {
+            for (int k = 0; k < NSTRN; k++) {
                 if (out[current_state] & (1 << k)) {
                     counters[k] += 1;
                 }
@@ -266,28 +266,95 @@ void search(int n_size, char haystacks[HSTRN][HSTRL], int* counters) {
 // Driver program to test above
 int main(int argc, char** argv) {
 
-    int n_size = 4, h_size = 1;
-
-    int* counters = calloc(n_size, sizeof(int));
-
-    char needles[NSTRN][NSTRL];
-
-    strcpy(needles[0], "he");
-    strcpy(needles[1], "she");
-    strcpy(needles[2], "hers");
-    strcpy(needles[3], "his");
+    struct timeval begin, end;
 
     char haystacks[HSTRN][HSTRL];
+    char needles[NSTRN][NSTRL];
 
-    strcpy(haystacks[0], "ahishers");
-    strcpy(haystacks[1], "ahishers");
+    int* counters = calloc(NSTRN, sizeof(int));
+
+    int counter = 0;
+    size_t size = 0;
+    char* buffer = NULL;
+    
+    /* Start reading texts file */
+    FILE* texts = fopen(argv[1], "r");
+    
+    if (texts == NULL) {
+        printf("Error opening texts file\n");
+        return -1;
+    }
+
+    while (!feof(texts)) {
+        counter = counter + 1;
+
+        if (getline(&buffer, &size, texts) != -1) {
+            
+            /* Substitute the new line with an end of string */
+            buffer[strcspn(buffer, "\n")] = 0;
+            
+            /* Copy the string to the new string */
+            strcpy(haystacks[counter - 1], buffer);
+
+        } else {
+            printf("Error while reading texts file\n");
+            return -1;
+        }
+    }
+
+    fclose(texts);
+    /* End reading texts file */
+
+    counter = 0;
+    size = 0;
+    buffer = NULL;
+
+    /* Start reading patterns file */
+    FILE* patterns = fopen(argv[2], "r");
+
+    if (patterns == NULL) {
+        printf("Error opening patterns file\n");
+        return -1;
+    }
+
+    while (!feof(patterns)) {
+        counter = counter + 1;
+
+        if (getline(&buffer, &size, patterns) != -1) {
+            
+            /* Substitute the new line with an end of string */
+            buffer[strcspn(buffer, "\n")] = 0;
+            
+            /* Copy the line to the new string */
+            strcpy(needles[counter - 1], buffer);
+        
+        } else {
+            printf("Error while reading texts file\n");
+            return -1;
+        }
+    }
+
+    fclose(patterns);
+    /* End reading patterns file */
 
     /* Building the AC graph */
-    build_ac_graph(needles, n_size);
+    build_ac_graph(needles);
 
-    search(n_size, haystacks, counters);
+    /* Start searching time */
+    gettimeofday(&begin, 0);
 
-    for (int i = 0; i < n_size; i++)
+    search(haystacks, counters);
+
+    /* End searching time */
+    gettimeofday(&end, 0);
+
+    long seconds = end.tv_sec - begin.tv_sec;
+    long microseconds = end.tv_usec - begin.tv_usec;
+    double elapsed = seconds + microseconds*1e-6;
+    
+    printf("Time measured: %.3f seconds.\n", elapsed);
+
+    for (int i = 0; i < NSTRN; i++)
         printf("Needle %s found %d times\n", needles[i], counters[i]);
  
     return 0;
