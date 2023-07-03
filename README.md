@@ -4,17 +4,19 @@ In this repository I'm going to show my multicore programming course project, wh
 
 ## Building the Trie
 
-The first step is to build a Trie for the pattern strings.
+The first step is to build the Trie.
 
-We start creating a root node, then go through each pattern character by character. Starting from the root, try and follow an edge for the current character. If one does not exist, create an edge to a new node for that character.
+Create a root node, then go through each pattern character by character. Starting from the root, try and follow an edge for the current character. If one does not exist, create an edge to a new node for that character.
 
 Using P = {vine, vincent, cent, center}, say we start with the pattern 'vine'. When we go and add the next pattern 'vincent', we first follow the existing edges for v-i-n, and then add in new edges for c-e-n-t:
 
 ![Example 1](https://user-images.githubusercontent.com/31989626/222902315-33d2076f-02f1-4d35-bf16-35eb69020dc8.png)
 
-(The ends of the patterns are marked with a double circle). Continue this process until the whole Trie is built:
+(I'm marking the ends of each pattern with a double circle). Continue this process until the whole trie is built:
 
 ![Example 2](https://user-images.githubusercontent.com/31989626/222902343-9ca00437-d664-446a-b9f9-2685aac4ab0a.png)
+
+### Code implementation
 
 The Trie data structure implementation was pretty easy.
 
@@ -29,7 +31,7 @@ struct TrieNode {
 };
 ```
 
-Now we have to make a function to create the nodes of our Trie and another function to fill the actual structure. 
+Now we have to make a function to create the nodes of our Trie and another function to fill the actual structure.
 
 The following function is the one that allows the creation of our nodes, it simply allocate the memory for a node and initializate it
 
@@ -46,7 +48,7 @@ struct TrieNode* insert_node() {
 }
 ```
 
-Next we have the function that allow us to fill the Trie with the patterns we have to search for. This time we give the root of the Trie and the pattern to search for as arguments to the function. Then we iterate char by char over the pattern to add and create the edges of our Trie if they don't really exist and when we are at the end of the word we flag the last node as leaf. 
+Next we have the function that allow us to fill the Trie with the patterns we have to search for. This time we give the root of the Trie and the pattern to search for as arguments to the function. Then we iterate char by char over the pattern to add and create the edges of our Trie if they don't really exist and when we are at the end of the word we flag the last node as leaf.
 
 ```c
 void insert_pattern(struct TrieNode* root, char* pattern) {
@@ -79,7 +81,9 @@ If this node has an edge for x, then set wx's failure link to point at nx. Else 
 
 ![Example 5](https://user-images.githubusercontent.com/31989626/222902414-88d59816-4c38-4337-ad4c-a47dca47cb3d.png)
 
-Before going to implement the failure links we have to add a new field in our Trie node struct a link to another Trie node that we will call failure so now our struct should look like this 
+### Code implementation
+
+Before going to implement the failure links we have to add a new field in our Trie node struct a link to another Trie node that we will call failure so now our struct should look like this
 
 ```c
 struct TrieNode {
@@ -94,10 +98,11 @@ Of course you will have to be careful and handle the new field also in the previ
 Now to implement the failure links we have to the BFS, so the first thing is to get a Queue, in this case I implemented my own Queue.
 
 Now for each element of the queue we iterate over their children and we follow two basic rules:
+
 - If the parent of the child is root then the failure link will point to root
 - Else we follow the failure links of the current node taken in exam until the failure link is the actual root or until the child of the failure is an actual valid node
 
-At the end of that process with find the node to point to in case of failure. 
+At the end of that process with find the node to point to in case of failure.
 
 Now we have to repeat it for every node in the queue until is empty
 
@@ -144,6 +149,8 @@ If m corresponds to one of the pattern strings (is marked with a double circle),
 
 ![Example 6](https://user-images.githubusercontent.com/31989626/222902439-2df025ca-6d40-4922-9ba3-bfb7b5b5c3a5.png)
 
+### Code implementation
+
 ```c
 void add_output_links(struct TrieNode* root) {
     /* Initializing the queue */
@@ -176,6 +183,8 @@ void add_output_links(struct TrieNode* root) {
 ```
 
 ## Writing the Search
+
+### Code implementation
 
 ## Parallelization
 
