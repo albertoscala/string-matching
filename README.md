@@ -18,9 +18,9 @@ Using P = {vine, vincent, cent, center}, say we start with the pattern 'vine'. W
 
 ### Code implementation
 
-The Trie data structure implementation was pretty easy.
+The implementation of the Trie data structure was relatively straightforward.
 
-Starting from the struct of a node we need two things: a list of children, a variable that indicates that the node is the end of a pattern (leaf). So I came up with this C struct.
+To begin, we require two elements in the node structure: a list of children and a variable to indicate whether the node marks the end of a pattern (leaf). With these considerations in mind, I devised the following C struct for the implementation.
 
 ```c
 #define ALPHABET_SIZE 26
@@ -31,9 +31,9 @@ struct TrieNode {
 };
 ```
 
-Now we have to make a function to create the nodes of our Trie and another function to fill the actual structure.
+Now, we need to create two functions: one for generating the nodes of our Trie and another for populating the actual structure.
 
-The following function is the one that allows the creation of our nodes, it simply allocate the memory for a node and initializate it
+The following function enables the creation of our nodes by allocating memory for a node and initializing it.
 
 ```c
 struct TrieNode* insert_node() {
@@ -48,7 +48,7 @@ struct TrieNode* insert_node() {
 }
 ```
 
-Next we have the function that allow us to fill the Trie with the patterns we have to search for. This time we give the root of the Trie and the pattern to search for as arguments to the function. Then we iterate char by char over the pattern to add and create the edges of our Trie if they don't really exist and when we are at the end of the word we flag the last node as leaf.
+Next, we have the function that enables us to populate the Trie with the patterns we need to search for. This function takes the root of the Trie and the pattern to search for as arguments. We iterate character by character through the pattern, adding and creating edges in our Trie if they do not already exist. Finally, when we reach the end of the word, we mark the last node as a leaf.
 
 ```c
 void insert_pattern(struct TrieNode* root, char* pattern) {
@@ -73,17 +73,17 @@ Now to add the suffix links, we perform a breadth first search of the tree, addi
 
 ![Example 3](https://user-images.githubusercontent.com/31989626/222902379-d5869f86-4b38-4521-acca-aa498bb96dd3.png)
 
-Otherwise, the node corresponds to some string  *wx* , where *x* is the final character. For example, if we look at the string 'vi',  *w* ='v' and  *x* ='i'. Now follow  *w* 's suffix link and let the node you arrive at be called *n*.
+Otherwise, the node corresponds to some string *wx*, where *x* is the final character. For example, if we look at the string 'vi', *w* ='v' and *x* ='i'. Now follow *w*'s suffix link and let the node you arrive at be called *n*.
 
 ![Example 4](https://user-images.githubusercontent.com/31989626/222902401-a85357d3-66d2-4f97-b30d-ee9ba3edaecf.png)
 
-If this node has an edge for  *x* , then set  *wx* 's suffix link to point at  *nx* . Else if *n* is the root node, set  *wx* 's suffix link to point at  *n* . Otherwise, follow  *n* 's suffix link, let this node be the new  *n* , and repeat. In this case, the node for *n* does not have an edge for 'i'. Here's another example adding in the suffix link for 'vinc', where  *w* ='vin' and  *x* ='c':
+If this node has an edge for *x*, then set *wx* 's suffix link to point at *nx*. Else if *n* is the root node, set  *wx*'s suffix link to point at *n*. Otherwise, follow *n*'s suffix link, let this node be the new *n*, and repeat. In this case, the node for *n* does not have an edge for 'i'. Here's another example adding in the suffix link for 'vinc', where *w*='vin' and *x*='c':
 
 ![Example 5](https://user-images.githubusercontent.com/31989626/222902414-88d59816-4c38-4337-ad4c-a47dca47cb3d.png)
 
 ### Code implementation
 
-Before going to implement the failure links we have to add a new field in our Trie node struct a link to another Trie node that we will call failure so now our struct should look like this
+ Before proceeding with the implementation of failure links, we need to introduce a new field in our Trie node struct: a link to another Trie node that we will refer to as "failure." As a result, our struct should be updated to include this additional field. Here is the modified struct representation:
 
 ```c
 struct TrieNode {
@@ -93,18 +93,20 @@ struct TrieNode {
 };
 ```
 
-Of course you will have to be careful and handle the new field also in the previous implemented functions
+Certainly, it is important to handle the new field carefully and make appropriate adjustments in the previously implemented functions to account for it.
 
-Now to implement the failure links we have to the BFS, so the first thing is to get a Queue, in this case I implemented my own Queue.
+To implement the failure links, we need to use a breadth-first search (BFS) approach. The first step is to obtain a queue. In this case, I have implemented my own Queue data structure.
 
-Now for each element of the queue we iterate over their children and we follow two basic rules:
+For each element in the queue, we iterate over its children and follow two fundamental rules:
 
-- If the parent of the child is root then the failure link will point to root
-- Else we follow the failure links of the current node taken in exam until the failure link is the actual root or until the child of the failure is an actual valid node
+1. If the parent of the child is the root, the failure link will point to the root.
+2. Otherwise, we trace the failure links of the current node being examined until either the failure link reaches the root or the child of the failure link becomes a valid node.
 
-At the end of that process with find the node to point to in case of failure.
+By following these rules, we determine the appropriate node to point to in case of failure.
 
-Now we have to repeat it for every node in the queue until is empty
+This process is repeated for every node in the queue until the queue becomes empty.
+
+It is crucial to ensure that all functions are updated to handle the new field and incorporate the logic for failure links accordingly.
 
 ```c
 void build_failure_links(struct TrieNode* root) {
@@ -143,13 +145,17 @@ void build_failure_links(struct TrieNode* root) {
 
 ## Adding Output Links
 
-As you are performing the BFS to fill in the suffix links, you can also fill in the output links (all initially null). Let the current node be  *n* . Follow  *n* 's suffix link and let the node you arrive at be called  *m* .
+As you are performing the BFS to fill in the suffix links, you can also fill in the output links (all initially null). Let the current node be *n*. Follow *n*'s suffix link and let the node you arrive at be called *m*.
 
-If *m* corresponds to one of the pattern strings (is marked with a double circle), set  *n* 's output link to point at  *m* . Else set  *n* 's output link to point at the same node as  *m* 's output link, or null if *m* has no output link. In our example there is only one output link, shown here in green:
+If *m* corresponds to one of the pattern strings (is marked with a double circle), set *n*'s output link to point at *m*. Else set *n*'s output link to point at the same node as *m*'s output link, or null if *m* has no output link. In our example there is only one output link, shown here in green:
 
 ![Example 6](https://user-images.githubusercontent.com/31989626/222902439-2df025ca-6d40-4922-9ba3-bfb7b5b5c3a5.png)
 
 ### Code implementation
+
+This part is quite similar to the previous step. Once again, we perform a breadth-first search (BFS) over the graph and follow the failure link of each current node. Here's how it works:
+
+If the current node, along with its failure link, points to the end of a word, we set the output link of the current node to that particular node. However, if the current node and its failure link do not point to the end of a word, we set the output link of the current node to be the same as the output link of the failure link.
 
 ```c
 void add_output_links(struct TrieNode* root) {
@@ -184,7 +190,57 @@ void add_output_links(struct TrieNode* root) {
 
 ## Writing the Search
 
+Now, we reach the final part of the algorithm, where we utilize the constructed structure to find matches within our text.
+
+Before diving into the code implementation, let's analyze the different scenarios in which we encounter a match:
+
+1. The first occasion is when the current character represents the end of a pattern.
+2. The second occasion is when the current character has an output link, indicating a complete match of a pattern.
+3. The last occasion is when we traverse the failure links, and one of them leads to an output link, signifying a match.
+
+These three cases cover the various situations in which matches can be found during the search process. By identifying these matches, we can accurately track the occurrence of patterns within the given text.
+
+Now, armed with this understanding, we can proceed to implement the search function in the code editor.
+
 ### Code implementation
+
+The first thing we have to do is to iterate over the haystack. 
+
+```c
+void search(struct TrieNode* root, char* haystack, int* counters) {
+    int n = strlen(haystack);
+    struct TrieNode* curr = root;
+
+    /* Iterating over the string to analyze */
+    for (int i = 0; i < n; i++) {
+        int index = haystack[i] - 'a';
+
+        while (curr != root && !curr->children[index]) {
+            curr = curr->failure;
+        }
+
+        if (curr->children[index])
+            curr = curr->children[index];
+
+        /* Pattern match was found */
+        if (curr->is_end_of_word)
+            counters[curr->id] = counters[curr->id] + 1;
+
+        /* Pattern match was found */ 
+        if (curr->output)
+            counters[curr->output->id] = counters[curr->output->id] + 1;
+
+        struct TrieNode* suffix_node = curr->failure;
+        while (suffix_node) {
+            /* Pattern match was found */
+            if (suffix_node->output)
+                counters[suffix_node->output->id] = counters[suffix_node->output->id] + 1;
+  
+            suffix_node = suffix_node->failure;
+        }
+    }
+}
+```
 
 ## Parallelization
 
