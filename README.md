@@ -257,9 +257,190 @@ void search(struct TrieNode* root, char* haystack, int* counters) {
 
 ## Parallelization
 
-### Problems
+### Problem explanation and solution
 
-### Solution
+
+### Implementation
+
+#### Pthread
+
+
+```c
+void search(struct TrieNode* root, char** haystacks, int h_size, int* counters) {
+    /* Getting the number of threads available on the machine */
+    int n_threads = sysconf(_SC_NPROCESSORS_ONLN) - 1;
+
+    int l_threads = (h_size < n_threads) ? h_size : n_threads;
+
+    pthread_t threads[l_threads];
+
+    struct Arguments* args;
+
+    int part_size = h_size / l_threads;
+    int remainder = h_size % l_threads;
+    int start_idx = 0, end_idx = 0;
+
+    for(int i = 0; i < l_threads; i++) {
+        end_idx += part_size;
+
+        if (remainder > 0) {
+            end_idx++;
+            remainder--;
+        }
+
+        args = malloc(sizeof(struct Arguments));
+
+        args->root = root;
+        args->haystacks = haystacks;
+        args->haystacks_start = start_idx;
+        args->haystacks_end = end_idx;
+        args->counters = counters;
+
+        pthread_create(&threads[i], NULL, threaded_search, args);
+
+        start_idx = end_idx;
+    }
+  
+    for (int i = 0; i < l_threads; i++) {
+        pthread_join(threads[i], NULL);
+    }
+}
+```
+
+
+
+```c
+void* threaded_search(void* args) {
+    struct Arguments* pa = (struct Arguments*) args;
+
+    struct TrieNode* root = pa->root;
+
+    char** haystacks = pa->haystacks;
+    int haystacks_start = pa->haystacks_start;
+    int haystacks_end = pa->haystacks_end;
+
+    // printf("Thread creato n tasks %d start %d end %d\n", haystacks_end - haystacks_start, haystacks_start, haystacks_end);
+
+    int* counters = pa->counters;
+
+    for (int h = haystacks_start; h < haystacks_end; h++) {
+        char* haystack = haystacks[h];
+  
+        int n = strlen(haystack);
+        struct TrieNode* curr = root;
+
+        /* Iterating over the string to analyze */
+        for (int i = 0; i < n; i++) {
+            int index = haystack[i] - 'a';
+
+            while (curr != root && !curr->children[index]) {
+                curr = curr->failure;
+            }
+
+            if (curr->children[index])
+                curr = curr->children[index];
+
+            /* Pattern match was found */
+            if (curr->is_end_of_word) {
+                pthread_mutex_lock(&lock);
+                counters[curr->id] = counters[curr->id] + 1;
+                // printf("Pattern found: %s\n", curr->pattern);
+                pthread_mutex_unlock(&lock);
+            }
+
+            /* Pattern match was found */ 
+            if (curr->output) {
+                pthread_mutex_lock(&lock);
+                counters[curr->output->id] = counters[curr->output->id] + 1;
+                // printf("Pattern found: %s\n", curr->output->pattern);
+                pthread_mutex_unlock(&lock);
+            }
+
+            struct TrieNode* suffix_node = curr->failure;
+            while (suffix_node) {
+                /* Pattern match was found */
+                if (suffix_node->output) {
+                    pthread_mutex_lock(&lock);
+                    counters[suffix_node->output->id] = counters[suffix_node->output->id] + 1;
+                    // printf("Pattern found: %s\n", suffix_node->output->pattern);
+                    pthread_mutex_unlock(&lock);
+                }
+            
+                suffix_node = suffix_node->failure;
+            }
+        }
+    }
+
+    pthread_exit(NULL);
+}
+```
+
+#### OpenMP
+
+
+```c
+// main function
+#   pragma omp parallel for
+    for (int i = 0; i < h_size; i++)
+        search(root, haystacks[i], counters);
+```
+
+
+```c
+void search(struct TrieNode* root, char* haystack, int* counters) {
+    int n = strlen(haystack);
+    struct TrieNode* curr = root;
+
+    /* Iterating over the string to analyze */
+    for (int i = 0; i < n; i++) {
+        int index = haystack[i] - 'a';
+
+        while (curr != root && !curr->children[index]) {
+            curr = curr->failure;
+        }
+
+        if (curr->children[index])
+            curr = curr->children[index];
+
+        /* Pattern match was found */
+        if (curr->is_end_of_word) {
+    
+#           pragma omp critical
+            {
+                counters[curr->id] = counters[curr->id] + 1;
+            }
+            //printf("Pattern found: %s\n", curr->pattern);
+        }
+
+        /* Pattern match was found */ 
+        if (curr->output) {
+
+#           pragma omp critical
+            {
+                counters[curr->output->id] = counters[curr->output->id] + 1;
+            }
+            // printf("Pattern found: %s\n", curr->output->pattern);
+        }
+
+        struct TrieNode* suffix_node = curr->failure;
+        while (suffix_node) {
+            /* Pattern match was found */
+            if (suffix_node->output) {
+
+#               pragma omp critical
+                {
+                    counters[suffix_node->output->id] = counters[suffix_node->output->id] + 1;
+                }
+                // printf("Pattern found: %s\n", suffix_node->output->pattern);
+            }
+        
+            suffix_node = suffix_node->failure;
+        }
+    }
+}
+```
+
+
 
 ## License
 
