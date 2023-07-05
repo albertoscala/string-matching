@@ -204,7 +204,20 @@ Now, armed with this understanding, we can proceed to implement the search funct
 
 ### Code implementation
 
-The first thing we have to do is to iterate over the haystack. 
+To begin, we iterate through each character in the `haystack` string.
+
+First, we check if the next character exists as a child node in the Trie. If not, we backtrack through the Trie by following failure links until we either reach the root or find a node with the existing child.
+
+If the child node exists, we update the current node (`curr`) pointer to point to the child.
+
+Next, we perform two checks to see if we have encountered a match:
+
+1. We verify if the current character marks the end of a word (pattern).
+2. We check if the current node has an output link, indicating a complete match of a pattern.
+
+Finally, we enter a `while` loop to traverse the failure links. We check each node along the failure links to see if they have any output links. This process continues until we reach the root of the Trie.
+
+By following these steps, we efficiently search for matches in the `haystack` string using the Aho-Corasick algorithm. The use of failure links optimizes the search process and ensures accurate identification of pattern matches throughout the Trie structure.
 
 ```c
 void search(struct TrieNode* root, char* haystack, int* counters) {
