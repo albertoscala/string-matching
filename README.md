@@ -257,13 +257,18 @@ void search(struct TrieNode* root, char* haystack, int* counters) {
 
 ## Parallelization
 
-### Problem explanation and solution
+### Problem explanation
 
+Now, let's discuss the possibility of parallelizing the program. However, before proceeding, we need to identify suitable points for parallelization and determine if parallelization is beneficial in those areas.
+
+To analyze this, let's divide the program into two main parts: graph creation and pattern search, and evaluate them individually:
+
+1. Graph creation: Unfortunately, this part is not amenable to parallelization. The process involves multiple memory accesses and would require extensive locking mechanisms, which would likely introduce overhead and negate any potential benefits of parallelization.
+2. Pattern search: On the other hand, the pattern search phase is highly parallelizable. The key is to devise a strategy for dividing the haystack among multiple threads, ensuring an equal distribution of work.
 
 ### Implementation
 
 #### Pthread
-
 
 ```c
 void search(struct TrieNode* root, char** haystacks, int h_size, int* counters) {
@@ -306,7 +311,6 @@ void search(struct TrieNode* root, char** haystacks, int h_size, int* counters) 
     }
 }
 ```
-
 
 
 ```c
@@ -365,7 +369,7 @@ void* threaded_search(void* args) {
                     // printf("Pattern found: %s\n", suffix_node->output->pattern);
                     pthread_mutex_unlock(&lock);
                 }
-            
+          
                 suffix_node = suffix_node->failure;
             }
         }
@@ -377,14 +381,12 @@ void* threaded_search(void* args) {
 
 #### OpenMP
 
-
 ```c
 // main function
 #   pragma omp parallel for
     for (int i = 0; i < h_size; i++)
         search(root, haystacks[i], counters);
 ```
-
 
 ```c
 void search(struct TrieNode* root, char* haystack, int* counters) {
@@ -404,7 +406,7 @@ void search(struct TrieNode* root, char* haystack, int* counters) {
 
         /* Pattern match was found */
         if (curr->is_end_of_word) {
-    
+  
 #           pragma omp critical
             {
                 counters[curr->id] = counters[curr->id] + 1;
@@ -433,14 +435,12 @@ void search(struct TrieNode* root, char* haystack, int* counters) {
                 }
                 // printf("Pattern found: %s\n", suffix_node->output->pattern);
             }
-        
+      
             suffix_node = suffix_node->failure;
         }
     }
 }
 ```
-
-
 
 ## License
 
