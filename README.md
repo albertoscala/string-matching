@@ -268,7 +268,21 @@ To analyze this, let's divide the program into two main parts: graph creation an
 
 ### Implementation
 
+We will be pursuing two distinct shared memory implementations. The first entails more extensive modifications and employs the pthread library, while the second follows a simpler approach and leverages OpenMP.
+
 #### Pthread
+
+The initial function under analysis is the `search` function.
+
+To begin, we ascertain the total count of available threads on the system, reducing this count by one to mitigate unforeseen issues.
+
+Next, we implement an initial control mechanism to determine the number of threads to be employed. If the number of strings slated for analysis is less than the available threads, we adjust the thread count accordingly. If not, we maintain the thread count at the maximum available.
+
+Subsequently, we commence the creation of work packages designated for thread processing. We establish the start and end points for array elements that each thread will analyze. These work packages are then assembled, and the threads are initiated.
+
+This process iterates for `n_threads` iterations.
+
+Finally, we invoke the `join` operation for each thread, ensuring proper synchronization and coordination.
 
 ```c
 void search(struct TrieNode* root, char** haystacks, int h_size, int* counters) {
@@ -312,6 +326,12 @@ void search(struct TrieNode* root, char** haystacks, int h_size, int* counters) 
 }
 ```
 
+Following the `search` function, we encounter `threaded_search`, the search function utilized by each thread.
+
+In this multi-threaded version, the core functionality remains largely similar to the single-threaded variant. However, two key augmentations are introduced:
+
+- The unpacking of arguments into their respective variables.
+- The incorporation of a counter to accumulate all the occurrences found. Proper locks are implemented to preempt any race conditions, ensuring thread safety during this process.
 
 ```c
 void* threaded_search(void* args) {
@@ -381,12 +401,16 @@ void* threaded_search(void* args) {
 
 #### OpenMP
 
+In the OpenMP version, the implementation is notably streamlined. We utilize the appropriate OpenMP pragma to parallelize the targeted 'for' loop, thereby achieving parallel execution of the loop's iterations.
+
 ```c
 // main function
 #   pragma omp parallel for
     for (int i = 0; i < h_size; i++)
         search(root, haystacks[i], counters);
 ```
+
+While OpenMP does simplify parallelization, it's important to identify and designate critical sections explicitly. OpenMP doesn't automatically manage critical sections. Instead, it relies on the programmer to specify and manage them, ensuring that shared resources are accessed in a thread-safe manner. Therefore, even with the advantages of OpenMP, it's essential to define and protect critical sections where data may be accessed concurrently to avoid race conditions and maintain program correctness.
 
 ```c
 void search(struct TrieNode* root, char* haystack, int* counters) {
