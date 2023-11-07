@@ -496,14 +496,13 @@ Data is omitted for the first set of tests due to their small scale, as such dif
 
 In the table below, you can observe the total time taken by each algorithm to complete individual tests, along with the corresponding Speedup values relative to the serial algorithm.
 
-The Speedup $'S'$ in parallel computing can be calculated using Amdahl's Law:
-
-\[S = \frac{1}{{(1 - P) + \frac{P}{N}}\]
+The Speedup $S$ in parallel computing can be calculated using Amdahl's Law:
+$S = \frac{1}{{(1 - P) + \frac{P}{N}}$
 
 Where:
-- \(S\) is the speedup factor.
-- \(P\) represents the fraction of a program that can be parallelized.
-- \(N\) is the number of processors or cores used for parallel execution.
+- $S$ is the speedup factor.
+- $P$ represents the fraction of a program that can be parallelized.
+- $N$ is the number of processors or cores used for parallel execution.
 
 #### Short test
 
