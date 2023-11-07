@@ -497,12 +497,12 @@ Data is omitted for the first set of tests due to their small scale, as such dif
 In the table below, you can observe the total time taken by each algorithm to complete individual tests, along with the corresponding Speedup values relative to the serial algorithm.
 
 The Speedup $S$ in this case is calulated as:
-$S = \frac{T_serial}{T_parallel}$
+$S = \frac{T_{serial}}{T_{parallel}}$
 
 Where:
 - $S$ is the speedup factor.
-- $T_serial$ is the wall time of the serial algorithm.
-- $T_parallel$ is the wall time of the parallel/improved algorithm.
+- $T_{serial}$ is the wall time of the serial algorithm.
+- $T_{parallel}$ is the wall time of the parallel/improved algorithm.
 
 #### Short test
 
