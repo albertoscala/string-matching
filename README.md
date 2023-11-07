@@ -468,7 +468,10 @@ void search(struct TrieNode* root, char* haystack, int* counters) {
 
 ## Time comparison
 
-|            |        1/2 Pattern         |        1/4 Pattern         |        1/8 Pattern         |
+In the initial table, we present time differences distributed across three columns. The first set of measurements corresponds to patterns at a 1/2 ratio to the haystack length, the second set to patterns at a 1/4 ratio, and the last set to patterns at a 1/8 ratio.
+
+Data is omitted for the first set of tests due to their small scale, as such differences would not yield statistically significant timing variations.
+
 | Test       | Seriale | Pthread | OpenMP | Seriale | Pthread | OpenMP | Seriale | Pthread | OpenMP |
 |------------|---------|---------|--------|---------|---------|--------|---------|---------|--------|
 | 100-10     | 0       | 0.001   | 0.002  | -       | -       | -      | -       | -       | -      |
@@ -488,6 +491,51 @@ void search(struct TrieNode* root, char* haystack, int* counters) {
 | Test       | Seriale | Pthread | OpenMP | Seriale | Pthread | OpenMP | Seriale | Pthread | OpenMP |
 | 100000-10  | 0.071   | 0.016   | 0.018  | 0.071   | 0.009   | 0.009  | 0.037   | 0.005   | 0.008  |
 | 100000-100 | 1.234   | 0.137   | 0.195  | 0.788   | 0.096   | 0.096  | 0.577   | 0.066   | 0.08   |
+
+### Total time and Speedup
+
+In the table below, you can observe the total time taken by each algorithm to complete individual tests, along with the corresponding Speedup values relative to the serial algorithm.
+
+The Speedup (S) in parallel computing can be calculated using Amdahl's Law:
+
+\[S = \frac{1}{{(1 - P) + \frac{P}{N}}\]
+
+Where:
+- \(S\) is the speedup factor.
+- \(P\) represents the fraction of a program that can be parallelized.
+- \(N\) is the number of processors or cores used for parallel execution.
+
+#### Short test
+
+| Type    | Time  | Speedup     |
+|---------|-------|-------------|
+| Seriale | 0.186 | 1           |
+| Pthread | 0.048 | 3.875       |
+| OpenMP  | 0.063 | 2.952380952 |
+
+#### Mid-short test
+
+| Type    | Time  | Speedup     |
+|---------|-------|-------------|
+| Seriale | 0.264 | 1           |
+| Pthread | 0.056 | 4.714285714 |
+| OpenMP  | 0.069 | 3.826086957 |
+
+#### Mig-long test
+
+| Type    | Time  | Speedup     |
+|---------|-------|-------------|
+| Seriale | 0.459 | 1           |
+| Pthread | 0.077 | 5.961038961 |
+| OpenMP  | 0.093 | 4.935483871 |
+
+#### Long test
+
+| Type    | Time  | Speedup     |
+|---------|-------|-------------|
+| Seriale | 1.305 | 1           |
+| Pthread | 0.153 | 8.529411765 |
+| OpenMP  | 0.213 | 6.126760563 |
 
 ## License
 
