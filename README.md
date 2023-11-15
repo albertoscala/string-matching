@@ -10,11 +10,15 @@ Create a root node, then go through each pattern character by character. Startin
 
 Using P = {vine, vincent, cent, center}, say we start with the pattern 'vine'. When we go and add the next pattern 'vincent', we first follow the existing edges for v-i-n, and then add in new edges for c-e-n-t:
 
-![Example 1](https://user-images.githubusercontent.com/31989626/222902315-33d2076f-02f1-4d35-bf16-35eb69020dc8.png)
+<p align="center">
+  <img name="Example 1" src="https://github.com/albertoscala/string-matching/blob/main/images/image%20(1).png" />
+</p>
 
 (I'm marking the ends of each pattern with a double circle). Continue this process until the whole trie is built:
 
-![Example 2](https://user-images.githubusercontent.com/31989626/222902343-9ca00437-d664-446a-b9f9-2685aac4ab0a.png)
+<p align="center">
+  <img name="Example 2" src="https://github.com/albertoscala/string-matching/blob/main/images/image%20(2).png" />
+</p>
 
 ### Code implementation
 
@@ -71,16 +75,19 @@ void insert_pattern(struct TrieNode* root, char* pattern) {
 
 Now to add the suffix links, we perform a breadth first search of the tree, adding an edge for each node except the root. If a node is one hop away from the root, its suffix link goes to the root. Adding suffix links in blue, the suffix links for the nodes corresponding to 'v' and 'c' are:
 
-![Example 3](https://user-images.githubusercontent.com/31989626/222902379-d5869f86-4b38-4521-acca-aa498bb96dd3.png)
-
+<p align="center">
+  <img name="Example 3" src="https://github.com/albertoscala/string-matching/blob/main/images/image%20(3).png" />
+</p>
 Otherwise, the node corresponds to some string *wx*, where *x* is the final character. For example, if we look at the string 'vi', *w* ='v' and *x* ='i'. Now follow *w*'s suffix link and let the node you arrive at be called *n*.
 
-![Example 4](https://user-images.githubusercontent.com/31989626/222902401-a85357d3-66d2-4f97-b30d-ee9ba3edaecf.png)
-
+<p align="center">
+  <img name="Example 4" src="https://github.com/albertoscala/string-matching/blob/main/images/image%20(4).png" />
+</p>
 If this node has an edge for *x*, then set *wx* 's suffix link to point at *nx*. Else if *n* is the root node, set  *wx*'s suffix link to point at *n*. Otherwise, follow *n*'s suffix link, let this node be the new *n*, and repeat. In this case, the node for *n* does not have an edge for 'i'. Here's another example adding in the suffix link for 'vinc', where *w*='vin' and *x*='c':
 
-![Example 5](https://user-images.githubusercontent.com/31989626/222902414-88d59816-4c38-4337-ad4c-a47dca47cb3d.png)
-
+<p align="center">
+  <img name="Example 5" src="https://github.com/albertoscala/string-matching/blob/main/images/image%20(5).png" />
+</p>
 ### Code implementation
 
  Before proceeding with the implementation of failure links, we need to introduce a new field in our Trie node struct: a link to another Trie node that we will refer to as "failure." As a result, our struct should be updated to include this additional field. Here is the modified struct representation:
@@ -149,8 +156,9 @@ As you are performing the BFS to fill in the suffix links, you can also fill in 
 
 If *m* corresponds to one of the pattern strings (is marked with a double circle), set *n*'s output link to point at *m*. Else set *n*'s output link to point at the same node as *m*'s output link, or null if *m* has no output link. In our example there is only one output link, shown here in green:
 
-![Example 6](https://user-images.githubusercontent.com/31989626/222902439-2df025ca-6d40-4922-9ba3-bfb7b5b5c3a5.png)
-
+<p align="center">
+  <img name="Example 6" src="https://github.com/albertoscala/string-matching/blob/main/images/image%20(6).png" />
+</p>
 ### Code implementation
 
 This part is quite similar to the previous step. Once again, we perform a breadth-first search (BFS) over the graph and follow the failure link of each current node. Here's how it works:
