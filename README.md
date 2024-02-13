@@ -2,6 +2,28 @@
 
 In this repository I'm going to show my multicore programming course project, which consisted of implementing a string matching algorithm to find the patterns in the strings received from a socket and later on improve the algorthm performances using a multithread programmig library and applying the techniques to make a serial program into a parallel one. In this case I decided to implement the Aho-Corasick because it was the most interesting and efficent one because of its particular data structure
 
+# Table of Contents
+- [Building Trie](#building-trie)
+  - [Code Implementation](#code-implementation)
+- [Adding Failure Links](#adding-failure-links)
+  - [Code Implementation](#code-implementation)
+- [Adding Output Links](#adding-output-links)
+  - [Code Implementation](#code-implementation)
+- [Writing the Search](#writing-the-search)
+  - [Code Implementation](#code-implementation)
+- [Parallelization](#parallelization)
+  - [Problem Explanation](#problem-explanation)
+  - [Implementation](#implementation)
+    - [Pthread](#pthread)
+    - [OpemMP](#openmp)
+- [Time Comparison](#time-comparison)
+  - [Total Time and Speedup](#total-time-and-speedup)
+    - [Short Test](#short-test)
+    - [Mid-Short Test](#mid-short-test)
+    - [Mid-Long Test](#mid-long-test)
+    - [Long Test](#long-test)
+- [License](#license)
+
 ## Building the Trie
 
 The first step is to build the Trie.
@@ -88,6 +110,7 @@ If this node has an edge for *x*, then set *wx* 's suffix link to point at *nx*.
 <p align="center">
   <img src="https://github.com/albertoscala/string-matching/blob/main/images/image%20(5).png" />
 </p>
+
 ### Code implementation
 
  Before proceeding with the implementation of failure links, we need to introduce a new field in our Trie node struct: a link to another Trie node that we will refer to as "failure." As a result, our struct should be updated to include this additional field. Here is the modified struct representation:
