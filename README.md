@@ -2,15 +2,16 @@
 
 In this repository I'm going to show my multicore programming course project, which consisted of implementing a string matching algorithm to find the patterns in the strings received from a socket and later on improve the algorthm performances using a multithread programmig library and applying the techniques to make a serial program into a parallel one. In this case I decided to implement the Aho-Corasick because it was the most interesting and efficent one because of its particular data structure
 
-# Table of Contents
-- [Building Trie](#building-trie)
+## Table of Contents
+
+- [Building the Trie](#building-the-trie)
   - [Code Implementation](#code-implementation)
 - [Adding Failure Links](#adding-failure-links)
-  - [Code Implementation](#code-implementation)
+  - [Code Implementation](#code-implementation-1)
 - [Adding Output Links](#adding-output-links)
-  - [Code Implementation](#code-implementation)
+  - [Code Implementation](#code-implementation-2)
 - [Writing the Search](#writing-the-search)
-  - [Code Implementation](#code-implementation)
+  - [Code Implementation](#code-implementation-3)
 - [Parallelization](#parallelization)
   - [Problem Explanation](#problem-explanation)
   - [Implementation](#implementation)
@@ -42,7 +43,7 @@ Using P = {vine, vincent, cent, center}, say we start with the pattern 'vine'. W
   <img src="https://github.com/albertoscala/string-matching/blob/main/images/image%20(2).png" />
 </p>
 
-### Code implementation
+### Code Implementation
 
 The implementation of the Trie data structure was relatively straightforward.
 
@@ -100,6 +101,7 @@ Now to add the suffix links, we perform a breadth first search of the tree, addi
 <p align="center">
   <img src="https://github.com/albertoscala/string-matching/blob/main/images/image%20(3).png" />
 </p>
+
 Otherwise, the node corresponds to some string *wx*, where *x* is the final character. For example, if we look at the string 'vi', *w* ='v' and *x* ='i'. Now follow *w*'s suffix link and let the node you arrive at be called *n*.
 
 <p align="center">
@@ -182,7 +184,8 @@ If *m* corresponds to one of the pattern strings (is marked with a double circle
 <p align="center">
   <img src="https://github.com/albertoscala/string-matching/blob/main/images/image%20(6).png" />
 </p>
-### Code implementation
+
+### Code Implementation
 
 This part is quite similar to the previous step. Once again, we perform a breadth-first search (BFS) over the graph and follow the failure link of each current node. Here's how it works:
 
@@ -233,7 +236,7 @@ These three cases cover the various situations in which matches can be found dur
 
 Now, armed with this understanding, we can proceed to implement the search function in the code editor.
 
-### Code implementation
+### Code Implementation
 
 To begin, we iterate through each character in the `haystack` string.
 
@@ -288,7 +291,7 @@ void search(struct TrieNode* root, char* haystack, int* counters) {
 
 ## Parallelization
 
-### Problem explanation
+### Problem Explanation
 
 Now, let's discuss the possibility of parallelizing the program. However, before proceeding, we need to identify suitable points for parallelization and determine if parallelization is beneficial in those areas.
 
@@ -362,7 +365,9 @@ Following the `search` function, we encounter `threaded_search`, the search func
 In this multi-threaded version, the core functionality remains largely similar to the single-threaded variant. However, two key augmentations are introduced:
 
 - The unpacking of arguments into their respective variables.
-- The incorporation of a counter to accumulate all the occurrences found. Proper locks are implemented to preempt any race conditions, ensuring thread safety during this process.
+- The incorporation of a counter to accumulate all the occurrences found.
+
+Proper locks are implemented to preempt any race conditions, ensuring thread safety during this process.
 
 ```c
 void* threaded_search(void* args) {
@@ -497,7 +502,7 @@ void search(struct TrieNode* root, char* haystack, int* counters) {
 }
 ```
 
-## Time comparison
+## Time Comparison
 
 In the initial table, we present time differences distributed across three columns. The first set of measurements corresponds to patterns at a 1/2 ratio to the haystack length, the second set to patterns at a 1/4 ratio, and the last set to patterns at a 1/8 ratio.
 
@@ -523,7 +528,7 @@ Data is omitted for the first set of tests due to their small scale, as such dif
 | 100000-10  | 0.071   | 0.016   | 0.018  | 0.071   | 0.009   | 0.009  | 0.037   | 0.005   | 0.008  |
 | 100000-100 | 1.234   | 0.137   | 0.195  | 0.788   | 0.096   | 0.096  | 0.577   | 0.066   | 0.08   |
 
-### Total time and Speedup
+### Total Time and Speedup
 
 In the table below, you can observe the total time taken by each algorithm to complete individual tests, along with the corresponding Speedup values relative to the serial algorithm.
 
@@ -531,11 +536,12 @@ The Speedup $S$ in this case is calulated as:
 $S = \frac{T_{serial}}{T_{parallel}}$
 
 Where:
+
 - $S$ is the speedup factor.
 - $T_{serial}$ is the wall time of the serial algorithm.
 - $T_{parallel}$ is the wall time of the parallel/improved algorithm.
 
-#### Short test
+#### Short Test
 
 | Type    | Time  | Speedup     |
 |---------|-------|-------------|
@@ -543,7 +549,7 @@ Where:
 | Pthread | 0.048 | 3.875       |
 | OpenMP  | 0.063 | 2.952380952 |
 
-#### Mid-short test
+#### Mid-Short Test
 
 | Type    | Time  | Speedup     |
 |---------|-------|-------------|
@@ -551,7 +557,7 @@ Where:
 | Pthread | 0.056 | 4.714285714 |
 | OpenMP  | 0.069 | 3.826086957 |
 
-#### Mig-long test
+#### Mid-Long Test
 
 | Type    | Time  | Speedup     |
 |---------|-------|-------------|
@@ -559,7 +565,7 @@ Where:
 | Pthread | 0.077 | 5.961038961 |
 | OpenMP  | 0.093 | 4.935483871 |
 
-#### Long test
+#### Long Test
 
 | Type    | Time  | Speedup     |
 |---------|-------|-------------|
